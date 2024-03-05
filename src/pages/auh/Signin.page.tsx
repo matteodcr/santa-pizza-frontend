@@ -17,7 +17,7 @@ import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import classes from './Auth.module.css';
 import { useRootStore } from '@/stores/Root.store';
-import { GROUP, SIGNUP } from '@/routes';
+import { DASHBOARD, SIGNUP } from '@/routes';
 
 const Signin: React.FC = observer(() => {
   const navigate = useNavigate();
@@ -51,8 +51,8 @@ const Signin: React.FC = observer(() => {
       localStorage.removeItem('accessToken');
       await store.api.signin(form.values);
       console.log('token:', localStorage.getItem('accessToken'));
-      notifications.show({ title: 'token', message: localStorage.getItem('accessToken') });
-      navigate(GROUP);
+      await store.loadCurrentUser();
+      navigate(DASHBOARD);
     } catch (error) {
       notifications.show({
         message: undefined,

@@ -1,4 +1,4 @@
-import { Group } from '@/stores/Root.store';
+import { Group, User } from '@/stores/Root.store';
 
 export interface SignUpData {
   username: string;
@@ -18,11 +18,13 @@ export default class Api {
   private readonly signin_url: string;
   private readonly signup_url: string;
   private readonly group_url: string;
+  private readonly user_url: string;
 
   constructor(baseUrl: string) {
     this.signin_url = `${baseUrl}/auth/signin`;
     this.signup_url = `${baseUrl}/auth/signup`;
     this.group_url = `${baseUrl}/group`;
+    this.user_url = `${baseUrl}/user`;
   }
 
   async signin(form: SignInData): Promise<boolean> {
@@ -63,6 +65,21 @@ export default class Api {
 
   async fetchGroups(init?: RequestInit | undefined): Promise<Group[]> {
     return this.fetch(this.group_url, init);
+  }
+  async fetchGroup(id: number, init?: RequestInit | undefined): Promise<Group> {
+    return this.fetch(`${this.group_url}/${id}`, init);
+  }
+
+  async fetchCurrentUser(init?: RequestInit | undefined): Promise<User> {
+    return this.fetch(`${this.user_url}/me`, init);
+  }
+
+  async fetchUser(username: string, init?: RequestInit | undefined): Promise<User> {
+    return this.fetch(`${this.user_url}/${username}`, init);
+  }
+
+  async createGroup(id: number, init?: RequestInit | undefined): Promise<Group> {
+    return this.fetch(`${this.group_url}/${id}`, init);
   }
 
   private async fetch(input: RequestInfo, init?: RequestInit | undefined): Promise<any | null> {

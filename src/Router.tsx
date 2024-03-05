@@ -2,11 +2,15 @@ import { BrowserRouter, Route, Routes, useLocation, useNavigate } from 'react-ro
 import { useEffect } from 'react';
 import { notifications } from '@mantine/notifications';
 import { HomePage } from './pages/Home.page';
-import Signin from '@/pages/Signin.page';
-import { GROUP, SIGNIN, SIGNUP } from '@/routes';
-import GroupPage from '@/pages/Group.page';
+import Signin from '@/pages/auh/Signin.page';
+import { DASHBOARD, GROUP, SIGNIN, SIGNOUT, SIGNUP, USER } from '@/routes';
 import { useRootStore } from '@/stores/Root.store';
-import Signup from '@/pages/Signup.page';
+import Signup from '@/pages/auh/Signup.page';
+import User, { User404 } from '@/pages/User.page';
+import GroupPage from '@/pages/Group.page';
+import Dashboard from '@/pages/Dashboard.page';
+import { Header } from '@/components/Header';
+import Signout from '@/pages/auh/Signout.page';
 
 export function Router() {
   function SetupUnauthorizedHandler() {
@@ -31,11 +35,16 @@ export function Router() {
   return (
     <BrowserRouter>
       <SetupUnauthorizedHandler />
+      <Header />
       <Routes>
         <Route index element={<HomePage />} />
         <Route path={SIGNIN} element={<Signin />} />
         <Route path={SIGNUP} element={<Signup />} />
-        <Route path={GROUP} element={<GroupPage />} />
+        <Route path={SIGNOUT} element={<Signout />} />
+        <Route path={DASHBOARD} element={<Dashboard />} />
+        <Route path={`${GROUP}/:id`} element={<GroupPage />} />
+        <Route path={`${USER}/:username`} element={<User />} />
+        <Route path={`${USER}/404`} element={<User404 />} />
       </Routes>
     </BrowserRouter>
   );
