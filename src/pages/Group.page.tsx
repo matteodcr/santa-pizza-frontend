@@ -1,23 +1,45 @@
 import React, { Fragment, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
-import { Group as GroupMantine, Skeleton, Table, Text } from '@mantine/core';
-import { useNavigate, useParams } from 'react-router-dom';
+import {
+  Button,
+  Group as GroupMantine,
+  Modal,
+  Skeleton,
+  Table,
+  Text,
+  TextInput,
+  Title,
+} from '@mantine/core';
+import { useParams } from 'react-router-dom';
+import { runInAction } from 'mobx';
+import { IconPlus } from '@tabler/icons-react';
+import { useDisclosure } from '@mantine/hooks';
 import { useRootStore } from '@/stores/Root.store';
 import AvatarBadge from '@/components/AvatarBadge';
 
 const GroupPage: React.FC = observer(() => {
   const store = useRootStore();
-  const navigate = useNavigate();
   const { id } = useParams();
   const indexStoredGroup = store.groupById(Number(id));
+  const [username, setUsername] = React.useState('');
+  const [opened, { open, close }] = useDisclosure(false);
 
   useEffect(() => {
-    console.log('test');
     async function fetchData() {
-      store.groups[indexStoredGroup] = await store.api.fetchGroup(Number(id));
+      const updatedGroup = await store.api.fetchGroup(Number(id));
+      runInAction(() => {
+        store.groups[indexStoredGroup] = updatedGroup;
+      });
     }
     fetchData();
   }, [store.api]);
+
+  const handleAddUser = async () => {
+    await store.api.addUser({
+      groupId: Number(id),
+      username,
+    });
+  };
 
   const rows =
     store.groups[indexStoredGroup] !== undefined ? (
@@ -60,11 +82,17 @@ const GroupPage: React.FC = observer(() => {
 
   return (
     <>
-      <h1>{store.groups[indexStoredGroup]?.name}</h1>
-      <sub>{store.groups[indexStoredGroup]?.description}</sub>
+      <Title order={1} lineClamp={1}>
+        {store.groups[indexStoredGroup]?.name}
+      </Title>
+      <Title order={4} lineClamp={3}>
+        {store.groups[indexStoredGroup]?.description}
+      </Title>
 
-      <p>Creation date: {store.groups[indexStoredGroup]?.createdAt}</p>
-      <p>Due date: {store.groups[indexStoredGroup]?.dueDate}</p>
+      <Text>
+        Creation date: {new Date(store.groups[indexStoredGroup]?.createdAt).toDateString()}
+      </Text>
+      <Text>Due date: {new Date(store.groups[indexStoredGroup]?.dueDate).toDateString()}</Text>
 
       <Table.ScrollContainer minWidth={800}>
         <Table verticalSpacing="sm">
@@ -77,6 +105,29 @@ const GroupPage: React.FC = observer(() => {
           <Table.Tbody>{rows}</Table.Tbody>
         </Table>
       </Table.ScrollContainer>
+
+      <Button variant="light" onClick={open} leftSection={<IconPlus size={14} />}>
+        Add user
+      </Button>
+      <Modal opened={opened} onClose={close} title="Authentication">
+        <TextInput
+          label="User to add"
+          placeholder="Enter the username"
+          data-autofocus
+          value={username}
+          onChange={(event) => setUsername(event.currentTarget.value)}
+        />
+        <Button
+          fullWidth
+          onClick={() => {
+            handleAddUser();
+            close();
+          }}
+          mt="md"
+        >
+          Add
+        </Button>
+      </Modal>
     </>
   );
 });

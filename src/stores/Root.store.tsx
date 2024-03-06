@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import { makeAutoObservable } from 'mobx';
+import { makeAutoObservable, runInAction } from 'mobx';
 import Api from '@/stores/ApiStore';
 
 export interface Group {
@@ -27,40 +27,13 @@ export interface User {
 
 export class RootStore {
   api: Api;
+  public currentUser: User | undefined = undefined;
+  public groups: Group[] = [];
+  private users: User[] = [];
 
   constructor() {
     this.api = new Api('http://localhost:3000');
     makeAutoObservable(this);
-  }
-
-  private _currentUser: User | undefined = undefined;
-
-  public get currentUser() {
-    return this._currentUser;
-  }
-
-  public set currentUser(user: User | undefined) {
-    this._currentUser = user;
-  }
-
-  private _users: User[] = [];
-
-  public get users() {
-    return this._users;
-  }
-
-  public set users(users: User[]) {
-    this._users = users;
-  }
-
-  private _groups: Group[] = [];
-
-  public get groups() {
-    return this._groups;
-  }
-
-  public set groups(groups: Group[]) {
-    this._groups = groups;
   }
 
   public groupById(id: number): number {
@@ -72,17 +45,20 @@ export class RootStore {
   }
   public updateUser(updatedUsers: User[]): void {
     updatedUsers.forEach((updatedUser) => {
-      const index = this._users.findIndex((user) => user.id === updatedUser.id);
+      const index = this.users.findIndex((user) => user.id === updatedUser.id);
       if (index !== -1) {
-        this._users[index] = updatedUser;
+        this.users[index] = updatedUser;
       } else {
-        this._users.push(updatedUser);
+        this.users.push(updatedUser);
       }
     });
   }
 
   public async loadCurrentUser(): Promise<void> {
-    this.currentUser = await this.api.fetchCurrentUser();
+    const currentUser = await this.api.fetchCurrentUser();
+    runInAction(() => {
+      this.currentUser = currentUser;
+    });
   }
 }
 

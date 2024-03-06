@@ -11,10 +11,16 @@ export default function AvatarBadge({ user }: { user: User }) {
       : user.description
     : '';
   return (
-    <Group justify="center">
+    <Group
+      justify="center"
+      onClick={(e) => {
+        e.stopPropagation();
+        navigate(`${USER}/${user.username}`);
+      }}
+    >
       <HoverCard width={320} shadow="md" withArrow openDelay={200} closeDelay={400}>
         <HoverCard.Target>
-          <Avatar radius="xl" onClick={() => navigate(`${USER}/${user.username}`)} />
+          <Avatar radius="xl" />
         </HoverCard.Target>
         <HoverCard.Dropdown>
           <Group>

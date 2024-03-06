@@ -1,12 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import { Button, Table, Textarea, TextInput } from '@mantine/core';
+import { Anchor, Button, Group, Table } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
-import { modals } from '@mantine/modals';
 import { useForm } from '@mantine/form';
-import { DatePickerInput } from '@mantine/dates';
+import { runInAction } from 'mobx';
 import { useRootStore } from '@/stores/Root.store';
 import { GROUP } from '@/routes';
+import AvatarBadge from '@/components/AvatarBadge';
 
 const Dashboard: React.FC = observer(() => {
   const store = useRootStore();
@@ -14,18 +14,21 @@ const Dashboard: React.FC = observer(() => {
 
   useEffect(() => {
     async function fetchData() {
-      store.groups = await store.api.fetchGroups();
+      const groups = await store.api.fetchGroups();
+      runInAction(() => {
+        store.groups = groups;
+      });
+      console.log(store.groups);
     }
     fetchData();
   }, [store.api]);
 
-  //const handleCreateGroup = async () => {
+  const [value, setValue] = useState<Date | null>(null);
 
   const form = useForm({
     initialValues: {
       name: '',
       description: '',
-      dueDate: '',
     },
     validate: {
       name: (value: string) => {
@@ -40,63 +43,41 @@ const Dashboard: React.FC = observer(() => {
         }
         return undefined;
       },
-      dueDate: (value: string) => {
-        if (!value) {
-          return 'Due date is required';
-        }
-        return undefined;
-      },
     },
   });
 
   const rows = store.groups.map((group) => (
-    <Table.Tr key={group.id} onClick={() => navigate(`${GROUP}/${group.id}`)}>
-      <Table.Td>{group.name}</Table.Td>
-      <Table.Td>{group.dueDate}</Table.Td>
-      <Table.Td>{group.memberships.length}</Table.Td>
+    <Table.Tr
+      key={group.id}
+      onClick={() => navigate(`${GROUP}/${group.id}`)}
+      style={{ cursor: 'pointer' }}
+    >
+      <Table.Td>
+        <Anchor>{group.name}</Anchor>
+      </Table.Td>
+      <Table.Td>{new Date(group.dueDate).toDateString()}</Table.Td>
+
+      <Table.Td key={group.id}>
+        <Group gap="sm">
+          {group.memberships.map((membership) => (
+            <AvatarBadge key={membership.id} user={membership.user} />
+          ))}
+        </Group>
+      </Table.Td>
     </Table.Tr>
   ));
 
   return (
     <>
-      <Button
-        onClick={() => {
-          modals.open({
-            title: 'Create a group',
-            children: (
-              <form onSubmit={form.onSubmit((values) => console.log(values))}>
-                <TextInput
-                  label="Name"
-                  placeholder="Enter group name"
-                  {...form.getInputProps('name')}
-                />
-                <Textarea
-                  label="Description"
-                  placeholder="Enter group description"
-                  {...form.getInputProps('description')}
-                />
-                <DatePickerInput
-                  popoverProps={{ zIndex: 10000 }}
-                  valueFormat="YYYY-MM-DDTHH:mm:ssZ"
-                  label="Pick date"
-                  placeholder="Pick date"
-                />
-                <Button fullWidth onClick={() => modals.closeAll()} mt="md">
-                  Submit
-                </Button>
-              </form>
-            ),
-          });
-        }}
-      >
-        Create a group
+      <Button onClick={() => navigate(`${GROUP}/create`)} mt="md">
+        New group
       </Button>
-      <Table highlightOnHover>
+      <Table highlightOnHover striped verticalSpacing="lg">
         <Table.Thead>
           <Table.Tr>
             <Table.Th>Group name</Table.Th>
             <Table.Th>Due date</Table.Th>
-            <Table.Th>Nombre de participants</Table.Th>
+            <Table.Th>Members</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>{rows}</Table.Tbody>

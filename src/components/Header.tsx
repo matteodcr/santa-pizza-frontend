@@ -14,6 +14,7 @@ import {
 import { useDisclosure } from '@mantine/hooks';
 import { IconChevronDown, IconLogout, IconUser } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
+import { observer } from 'mobx-react';
 import classes from './Header.module.css';
 import logo from '../favicon.svg';
 import { DASHBOARD, SIGNIN, SIGNOUT, USER } from '@/routes';
@@ -21,7 +22,7 @@ import { useRootStore } from '@/stores/Root.store';
 
 const tabs = [{ name: 'Dashboard', url: DASHBOARD }];
 
-export function Header() {
+export const Header = observer(() => {
   const store = useRootStore();
   const navigate = useNavigate();
   const [opened, { toggle }] = useDisclosure(false);
@@ -41,14 +42,17 @@ export function Header() {
     return currentPath === SIGNOUT || currentPath === SIGNIN || currentPath === '/';
   };
 
-  if (isSignupOrDashboard()) {
-    return null;
-  }
   const items = tabs.map((tab) => (
     <Tabs.Tab value={tab.name} key={tab.name} onClick={() => navigate(tab.url)}>
       {tab.name}
     </Tabs.Tab>
   ));
+
+  const user = store.currentUser;
+
+  if (isSignupOrDashboard()) {
+    return null;
+  }
 
   return (
     <div className={classes.header}>
@@ -71,9 +75,9 @@ export function Header() {
                 className={cx(classes.user, { [classes.userActive]: userMenuOpened })}
               >
                 <Group gap={7}>
-                  <Avatar alt={store.currentUser?.name} radius="xl" size={20} />
+                  <Avatar alt={user?.name} radius="xl" size={20} />
                   <Text fw={500} size="sm" lh={1} mr={3}>
-                    {store.currentUser?.name}
+                    {user?.username}
                   </Text>
                   <IconChevronDown style={{ width: rem(12), height: rem(12) }} stroke={1.5} />
                 </Group>
@@ -81,7 +85,7 @@ export function Header() {
             </Menu.Target>
             <Menu.Dropdown>
               <Menu.Item
-                onClick={() => navigate(`${USER}/${store.currentUser?.username}`)}
+                onClick={() => navigate(`${USER}/${user?.username}`)}
                 leftSection={<IconUser style={{ width: rem(16), height: rem(16) }} stroke={1.5} />}
               >
                 Your profile
@@ -116,4 +120,4 @@ export function Header() {
       </Container>
     </div>
   );
-}
+});

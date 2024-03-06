@@ -12,6 +12,17 @@ export interface SignInData {
   password: string;
 }
 
+export interface CreateGroupData {
+  name: string;
+  description: string;
+  dueDate: string;
+}
+
+export interface AddUserData {
+  groupId: number;
+  username: string;
+}
+
 export default class Api {
   public onDisconnectedHandler: (() => void) | null = null;
 
@@ -19,12 +30,14 @@ export default class Api {
   private readonly signup_url: string;
   private readonly group_url: string;
   private readonly user_url: string;
+  private readonly membership_url: string;
 
   constructor(baseUrl: string) {
     this.signin_url = `${baseUrl}/auth/signin`;
     this.signup_url = `${baseUrl}/auth/signup`;
     this.group_url = `${baseUrl}/group`;
     this.user_url = `${baseUrl}/user`;
+    this.membership_url = `${baseUrl}/membership`;
   }
 
   async signin(form: SignInData): Promise<boolean> {
@@ -37,7 +50,6 @@ export default class Api {
     }).then(async (res) => {
       if (res.ok) {
         const data: { accessToken: string } = await res.json();
-        console.log(data);
         localStorage.setItem('accessToken', data.accessToken);
         return true;
       }
@@ -54,9 +66,7 @@ export default class Api {
       body: JSON.stringify(form),
     }).then(async (res) => {
       if (res.ok) {
-        const data = await res.json();
-        console.log(data);
-
+        await res.json();
         return true;
       }
       throw new Error('Signup failed');
@@ -78,8 +88,29 @@ export default class Api {
     return this.fetch(`${this.user_url}/${username}`, init);
   }
 
-  async createGroup(id: number, init?: RequestInit | undefined): Promise<Group> {
-    return this.fetch(`${this.group_url}/${id}`, init);
+  async createGroup(
+    createGroupData: CreateGroupData,
+    init?: RequestInit | undefined
+  ): Promise<Group> {
+    const requestOptions: RequestInit = {
+      method: 'POST', // You may need to adjust the HTTP method here
+      headers: {
+        'Content-Type': 'application/json', // Adjust content type if needed
+      },
+      body: JSON.stringify(createGroupData),
+    };
+    return this.fetch(`${this.group_url}`, requestOptions);
+  }
+
+  async addUser(addUserData: AddUserData, init?: RequestInit | undefined): Promise<Group> {
+    const requestOptions: RequestInit = {
+      method: 'POST', // You may need to adjust the HTTP method here
+      headers: {
+        'Content-Type': 'application/json', // Adjust content type if needed
+      },
+      body: JSON.stringify(addUserData),
+    };
+    return this.fetch(`${this.membership_url}/add`, requestOptions);
   }
 
   private async fetch(input: RequestInfo, init?: RequestInit | undefined): Promise<any | null> {
@@ -97,9 +128,10 @@ export default class Api {
     };
 
     return fetch(input, mergedInit).then((res) => {
+      if (res.ok) {
+        return res.json();
+      }
       switch (res.status) {
-        case 200:
-          return res.json();
         case 401: {
           this.onDisconnectedHandler?.();
           return null;
