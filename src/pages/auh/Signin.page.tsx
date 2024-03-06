@@ -53,10 +53,10 @@ const Signin: React.FC = observer(() => {
       console.log('token:', localStorage.getItem('accessToken'));
       await store.loadCurrentUser();
       navigate(DASHBOARD);
-    } catch (error) {
+    } catch (e) {
       notifications.show({
-        message: undefined,
-        title: 'Erreur de connexion',
+        title: `Erreur ${(e as Response).status}`,
+        message: (e as Response).statusText,
       });
     }
   };
