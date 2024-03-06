@@ -1,13 +1,14 @@
-import { Avatar, Group, HoverCard, Stack, Text } from '@mantine/core';
+import { Anchor, Avatar, Group, HoverCard, Text } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
+import React from 'react';
 import { User } from '@/stores/Root.store';
 import { USER } from '@/routes';
 
 export default function AvatarBadge({ user }: { user: User }) {
   const navigate = useNavigate();
   const truncatedDescription = user.description
-    ? user.description.length > 10
-      ? `${user.description.substring(0, 10)}...`
+    ? user.description.length > 30
+      ? `${user.description.substring(0, 30)}...`
       : user.description
     : '';
   return (
@@ -17,27 +18,25 @@ export default function AvatarBadge({ user }: { user: User }) {
         e.stopPropagation();
         navigate(`${USER}/${user.username}`);
       }}
+      style={{ cursor: 'pointer' }}
     >
       <HoverCard width={320} shadow="md" withArrow openDelay={200} closeDelay={400}>
         <HoverCard.Target>
           <Avatar radius="xl" />
         </HoverCard.Target>
         <HoverCard.Dropdown>
-          <Group>
-            <Avatar radius="xl" />
-            <Stack gap={5}>
-              <Text size="sm" fw={700} style={{ lineHeight: 1 }}>
-                {user.name}
-              </Text>
+          <Anchor style={{ flex: 1 }} onClick={() => navigate(`${USER}/${user.username}`)}>
+            <Text fz="sm" fw={500}>
+              {user.name}
+            </Text>
+            <Text fz="xs" c="dimmed">
               @{user.username}
-            </Stack>
-          </Group>
+            </Text>
+          </Anchor>
 
           <Text size="sm" mt="md">
             {truncatedDescription}
           </Text>
-
-          <Group mt="md" gap="xl" />
         </HoverCard.Dropdown>
       </HoverCard>
     </Group>

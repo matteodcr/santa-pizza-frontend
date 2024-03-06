@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import { Anchor, Button, Group, Table } from '@mantine/core';
+import { Anchor, Avatar, Button, Group, Table } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from '@mantine/form';
 import { runInAction } from 'mobx';
@@ -59,9 +59,11 @@ const Dashboard: React.FC = observer(() => {
 
       <Table.Td key={group.id}>
         <Group gap="sm">
-          {group.memberships.map((membership) => (
-            <AvatarBadge key={membership.id} user={membership.user} />
-          ))}
+          <Avatar.Group>
+            {group.memberships.map((membership) => (
+              <AvatarBadge key={membership.id} user={membership.user} />
+            ))}
+          </Avatar.Group>
         </Group>
       </Table.Td>
     </Table.Tr>

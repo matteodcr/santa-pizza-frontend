@@ -23,6 +23,11 @@ export interface AddUserData {
   username: string;
 }
 
+export interface RemoveUserData {
+  groupId: number;
+  username: string;
+}
+
 export default class Api {
   public onDisconnectedHandler: (() => void) | null = null;
 
@@ -53,7 +58,7 @@ export default class Api {
         localStorage.setItem('accessToken', data.accessToken);
         return true;
       }
-      throw new Error('Signin failed');
+      return false;
     });
   }
 
@@ -93,9 +98,9 @@ export default class Api {
     init?: RequestInit | undefined
   ): Promise<Group> {
     const requestOptions: RequestInit = {
-      method: 'POST', // You may need to adjust the HTTP method here
+      method: 'POST',
       headers: {
-        'Content-Type': 'application/json', // Adjust content type if needed
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(createGroupData),
     };
@@ -104,13 +109,24 @@ export default class Api {
 
   async addUser(addUserData: AddUserData, init?: RequestInit | undefined): Promise<Group> {
     const requestOptions: RequestInit = {
-      method: 'POST', // You may need to adjust the HTTP method here
+      method: 'POST',
       headers: {
-        'Content-Type': 'application/json', // Adjust content type if needed
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(addUserData),
     };
     return this.fetch(`${this.membership_url}/add`, requestOptions);
+  }
+
+  async removeUser(removeUserData: RemoveUserData, init?: RequestInit | undefined): Promise<Group> {
+    const requestOptions: RequestInit = {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(removeUserData),
+    };
+    return this.fetch(`${this.membership_url}/remove`, requestOptions);
   }
 
   private async fetch(input: RequestInfo, init?: RequestInit | undefined): Promise<any | null> {

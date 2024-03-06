@@ -36,6 +36,12 @@ export class RootStore {
     makeAutoObservable(this);
   }
 
+  public reset(): void {
+    this.groups = [];
+    this.users = [];
+    this.currentUser = undefined;
+  }
+
   public groupById(id: number): number {
     return this.groups.findIndex((group) => group.id === id);
   }
