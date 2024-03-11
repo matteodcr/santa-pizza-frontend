@@ -3,8 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import React from 'react';
 import { User } from '@/stores/Root.store';
 import { USER } from '@/routes';
+import getInitials from '@/utils/initials';
 
-export default function AvatarBadge({ user }: { user: User }) {
+interface AvatarBadgeProps {
+  user: User;
+  avatarSize?: number;
+}
+
+export default function AvatarBadge({ user, avatarSize }: AvatarBadgeProps) {
   const navigate = useNavigate();
   const truncatedDescription = user.description
     ? user.description.length > 30
@@ -22,7 +28,7 @@ export default function AvatarBadge({ user }: { user: User }) {
     >
       <HoverCard width={320} shadow="md" withArrow openDelay={200} closeDelay={400}>
         <HoverCard.Target>
-          <Avatar radius="xl" />
+          <Avatar size={avatarSize || 'md'}>{getInitials(user.name)}</Avatar>
         </HoverCard.Target>
         <HoverCard.Dropdown>
           <Anchor style={{ flex: 1 }} onClick={() => navigate(`${USER}/${user.username}`)}>

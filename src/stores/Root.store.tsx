@@ -9,12 +9,15 @@ export interface Group {
   memberships: Membership[];
   dueDate: string;
   createdAt: string;
+  status: string;
 }
 
 export interface Membership {
   id: number;
   user: User;
   role: string;
+  santaPizza: Pizza;
+  receiverPizza: Pizza;
 }
 
 export interface User {
@@ -23,6 +26,14 @@ export interface User {
   name?: string;
   description?: string;
   allergies?: string[];
+}
+
+export interface Pizza {
+  id: number;
+  description: string;
+  santaMembership: Membership;
+  receiverMembership: Membership;
+  status: string;
 }
 
 export class RootStore {
@@ -66,6 +77,22 @@ export class RootStore {
       this.currentUser = currentUser;
     });
   }
+
+  public getUserMembership(indexStoredGroup: number): Membership | undefined {
+    const group = this.groups[indexStoredGroup];
+
+    const membership = group.memberships.find((m) => m.user.id === this.currentUser?.id);
+    if (membership) {
+      return membership;
+    }
+    return undefined;
+  }
+
+  isRemovable = (usernameToCheck: string, indexStoredGroup: number): boolean =>
+    this.currentUser?.username !== usernameToCheck ||
+    this.groups[indexStoredGroup]?.memberships.find(
+      (membership) => membership.user.username === usernameToCheck
+    )?.role === 'USER';
 }
 
 const StoreContext = createContext(new RootStore());

@@ -5,6 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { IconInfoCircle } from '@tabler/icons-react';
 import { useRootStore } from '@/stores/Root.store';
 import { USER } from '@/routes';
+import getInitials from '@/utils/initials';
 
 const User: React.FC = observer(() => {
   const store = useRootStore();
@@ -27,7 +28,9 @@ const User: React.FC = observer(() => {
 
   return user ? (
     <Paper radius="md" withBorder p="lg" bg="var(--mantine-color-body)">
-      <Avatar size={120} radius={120} mx="auto" />
+      <Avatar size="xl" radius={120} mx="auto">
+        {getInitials(user.name)}
+      </Avatar>
       <Text ta="center" fz="lg" fw={500} mt="md">
         {user.name}
       </Text>
