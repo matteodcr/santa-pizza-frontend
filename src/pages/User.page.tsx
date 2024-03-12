@@ -7,7 +7,7 @@ import { useRootStore } from '@/stores/Root.store';
 import { USER } from '@/routes';
 import getInitials from '@/utils/initials';
 
-const User: React.FC = observer(() => {
+const UserPage: React.FC = observer(() => {
   const store = useRootStore();
   const navigate = useNavigate();
   const { username } = useParams();
@@ -47,7 +47,7 @@ const User: React.FC = observer(() => {
   );
 });
 
-export default User;
+export default UserPage;
 
 export const User404: React.FC = () => {
   const icon = <IconInfoCircle />;

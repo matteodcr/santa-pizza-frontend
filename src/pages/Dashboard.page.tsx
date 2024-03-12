@@ -7,7 +7,7 @@ import { useRootStore } from '@/stores/Root.store';
 import { GROUP } from '@/routes';
 import AvatarBadge from '@/components/AvatarBadge';
 
-const Dashboard: React.FC = observer(() => {
+const DashboardPage: React.FC = observer(() => {
   const store = useRootStore();
   const navigate = useNavigate();
 
@@ -64,4 +64,4 @@ const Dashboard: React.FC = observer(() => {
   );
 });
 
-export default Dashboard;
+export default DashboardPage;

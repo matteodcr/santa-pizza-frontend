@@ -51,6 +51,7 @@ const Signup: React.FC = observer(() => {
   const handleSignUp = async () => {
     try {
       await store.api.signup(form.values);
+      navigate(SIGNIN);
       // Handle success
     } catch (error) {
       // Handle error

@@ -8,11 +8,11 @@ import Signin from '@/pages/auh/Signin.page';
 import { DASHBOARD, GROUP, SIGNIN, SIGNOUT, SIGNUP, USER } from '@/routes';
 import { useRootStore } from '@/stores/Root.store';
 import Signup from '@/pages/auh/Signup.page';
-import User, { User404 } from '@/pages/User.page';
+import UserPage, { User404 } from '@/pages/User.page';
 import GroupPage from '@/pages/Group.page';
-import Dashboard from '@/pages/Dashboard.page';
+import DashboardPage from '@/pages/Dashboard.page';
 import Signout from '@/pages/auh/Signout.page';
-import CreateGroup from '@/pages/CreateGroup.page';
+import CreateGroupPage from '@/pages/CreateGroup.page';
 import { Header } from '@/components/Header';
 
 export function Router() {
@@ -52,10 +52,10 @@ export function Router() {
           <Route path={SIGNIN} element={<Signin />} />
           <Route path={SIGNUP} element={<Signup />} />
           <Route path={SIGNOUT} element={<Signout />} />
-          <Route path={DASHBOARD} element={<Dashboard />} />
+          <Route path={DASHBOARD} element={<DashboardPage />} />
           <Route path={`${GROUP}/:id`} element={<GroupPage />} />
-          <Route path={`${GROUP}/create`} element={<CreateGroup />} />
-          <Route path={`${USER}/:username`} element={<User />} />
+          <Route path={`${GROUP}/create`} element={<CreateGroupPage />} />
+          <Route path={`${USER}/:username`} element={<UserPage />} />
           <Route path={`${USER}/404`} element={<User404 />} />
         </Routes>
         <Notifications position="bottom-right" />

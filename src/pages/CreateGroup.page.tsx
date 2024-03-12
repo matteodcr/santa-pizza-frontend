@@ -8,7 +8,7 @@ import { useRootStore } from '@/stores/Root.store';
 import { CreateGroupData } from '@/stores/ApiStore';
 import { DASHBOARD } from '@/routes';
 
-const CreateGroup: React.FC = observer(() => {
+const CreateGroupPage: React.FC = observer(() => {
   const store = useRootStore();
   const navigate = useNavigate();
 
@@ -73,4 +73,4 @@ const CreateGroup: React.FC = observer(() => {
   );
 });
 
-export default CreateGroup;
+export default CreateGroupPage;

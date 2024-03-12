@@ -49,6 +49,15 @@ const GroupPage: React.FC = observer(() => {
     }
   };
 
+  const handleUpdateMember = async (role: string, usernameToUpdate: string, groupId: number) => {
+    await store.api.changeRole({
+      groupId,
+      username: usernameToUpdate,
+      role,
+    });
+    await fetchData();
+  };
+
   return store.groups[indexStoredGroup] !== undefined ? (
     <>
       <Title order={1} lineClamp={1}>
@@ -68,8 +77,10 @@ const GroupPage: React.FC = observer(() => {
         <Text>Group is closed</Text>
       )}
 
+      <Divider my="lg" />
+
       <GroupMembers
-        handleAddUser={handleAddUser}
+        handleUpdateMember={handleUpdateMember}
         handleRemoveUser={handleRemoveUser}
         indexStoredGroup={indexStoredGroup}
         open={open}
