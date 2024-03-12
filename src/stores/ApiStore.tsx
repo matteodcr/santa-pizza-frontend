@@ -28,6 +28,12 @@ export interface RemoveUserData {
   username: string;
 }
 
+export interface UpdateUserData {
+  groupId: number;
+  username: string;
+  role: string;
+}
+
 export default class Api {
   public onDisconnectedHandler: (() => void) | null = null;
 
@@ -127,6 +133,17 @@ export default class Api {
       body: JSON.stringify(removeUserData),
     };
     return this.fetch(`${this.membership_url}/remove`, requestOptions);
+  }
+
+  async changeRole(updateUserData: UpdateUserData, init?: RequestInit | undefined): Promise<Group> {
+    const requestOptions: RequestInit = {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updateUserData),
+    };
+    return this.fetch(`${this.membership_url}/update`, requestOptions);
   }
 
   private async fetch(input: RequestInfo, init?: RequestInit | undefined): Promise<any | null> {

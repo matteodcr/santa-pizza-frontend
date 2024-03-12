@@ -1,5 +1,5 @@
 import { ActionIcon, Anchor, Badge, Button, Flex, Table, Text } from '@mantine/core';
-import { IconPlus, IconTrash } from '@tabler/icons-react';
+import { IconArrowUp, IconPlus, IconTrash } from '@tabler/icons-react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import AvatarBadge from '@/components/AvatarBadge';
@@ -8,14 +8,14 @@ import { useRootStore } from '@/stores/Root.store';
 
 interface GroupMembersProps {
   indexStoredGroup: number;
-  handleAddUser: (username: string) => void;
+  handleUpdateMember: (role: string, usernameToUpdate: string, groupId: number) => void;
   handleRemoveUser: (username: string) => void;
   open: () => void;
 }
 
 const GroupMembers = ({
   indexStoredGroup,
-  handleAddUser,
+  handleUpdateMember,
   handleRemoveUser,
   open,
 }: GroupMembersProps) => {
@@ -52,6 +52,25 @@ const GroupMembers = ({
       <Table.Td>
         {store.isRemovable(membership.user.username, indexStoredGroup) ? (
           <Flex mih={50} gap="md" justify="flex-end" align="center" direction="row" wrap="wrap">
+            {membership.role === 'USER' ? (
+              <ActionIcon
+                variant="light"
+                color="blue"
+                size="xl"
+                onClick={() =>
+                  handleUpdateMember(
+                    'ADMIN',
+                    membership.user.username,
+                    store.groups[indexStoredGroup].id
+                  )
+                }
+              >
+                <IconArrowUp size={14} />
+              </ActionIcon>
+            ) : (
+              <> </>
+            )}
+
             <ActionIcon
               variant="light"
               color="red"

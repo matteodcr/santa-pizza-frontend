@@ -88,11 +88,14 @@ export class RootStore {
     return undefined;
   }
 
-  isRemovable = (usernameToCheck: string, indexStoredGroup: number): boolean =>
-    this.currentUser?.username !== usernameToCheck ||
-    this.groups[indexStoredGroup]?.memberships.find(
-      (membership) => membership.user.username === usernameToCheck
-    )?.role === 'USER';
+  isRemovable(usernameToCheck: string, indexStoredGroup: number): boolean {
+    return (
+      this.currentUser?.username !== usernameToCheck &&
+      this.groups[indexStoredGroup]?.memberships.find(
+        (membership) => membership.user.username === usernameToCheck
+      )?.role === 'USER'
+    );
+  }
 }
 
 const StoreContext = createContext(new RootStore());
