@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { Button, Textarea, TextInput } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from '@mantine/form';
-import { DateTimePicker } from '@mantine/dates';
+import { DatePickerInput } from '@mantine/dates';
 import { useRootStore } from '@/stores/Root.store';
 import { CreateGroupData } from '@/stores/ApiStore';
 import { DASHBOARD } from '@/routes';
@@ -21,8 +21,6 @@ const CreateGroupPage: React.FC = observer(() => {
     await store.api.createGroup(createGroupData);
     navigate(DASHBOARD);
   };
-
-  const [value, setValue] = useState<Date | null>(null);
 
   const form = useForm({
     initialValues: {
@@ -55,9 +53,9 @@ const CreateGroupPage: React.FC = observer(() => {
           placeholder="Enter group description"
           {...form.getInputProps('description')}
         />
-        <DateTimePicker
-          label="Date Time Picker"
-          placeholder="Pick date time"
+        <DatePickerInput
+          label="Due date"
+          placeholder="Pick event date"
           value={form.values.dueDate}
           onChange={(value) => {
             if (value instanceof Date) {

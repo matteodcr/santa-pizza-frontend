@@ -1,4 +1,4 @@
-import { Group, User } from '@/stores/Root.store';
+import { Group, Pizza, User } from '@/stores/Root.store';
 
 export interface SignUpData {
   username: string;
@@ -42,6 +42,7 @@ export default class Api {
   private readonly group_url: string;
   private readonly user_url: string;
   private readonly membership_url: string;
+  private readonly pizza_url: string;
 
   constructor(baseUrl: string) {
     this.signin_url = `${baseUrl}/auth/signin`;
@@ -49,6 +50,7 @@ export default class Api {
     this.group_url = `${baseUrl}/group`;
     this.user_url = `${baseUrl}/user`;
     this.membership_url = `${baseUrl}/membership`;
+    this.pizza_url = `${baseUrl}/pizza`;
   }
 
   async signin(form: SignInData): Promise<boolean> {
@@ -87,8 +89,8 @@ export default class Api {
   async fetchGroups(init?: RequestInit | undefined): Promise<Group[]> {
     return this.fetch(this.group_url, init);
   }
-  async fetchGroup(id: number, init?: RequestInit | undefined): Promise<Group> {
-    return this.fetch(`${this.group_url}/${id}`, init);
+  async fetchGroup(groupiId: number, init?: RequestInit | undefined): Promise<Group> {
+    return this.fetch(`${this.group_url}/${groupiId}`, init);
   }
 
   async fetchCurrentUser(init?: RequestInit | undefined): Promise<User> {
@@ -97,6 +99,10 @@ export default class Api {
 
   async fetchUser(username: string, init?: RequestInit | undefined): Promise<User> {
     return this.fetch(`${this.user_url}/${username}`, init);
+  }
+
+  async fetchPizza(pizzaId: number, init?: RequestInit | undefined): Promise<Pizza> {
+    return this.fetch(`${this.pizza_url}/${pizzaId}`, init);
   }
 
   async createGroup(
@@ -111,6 +117,28 @@ export default class Api {
       body: JSON.stringify(createGroupData),
     };
     return this.fetch(`${this.group_url}`, requestOptions);
+  }
+
+  async deleteGroup(groupId: number, init?: RequestInit | undefined): Promise<void> {
+    const requestOptions: RequestInit = {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: init?.body,
+    };
+    return this.fetch(`${this.group_url}/${groupId}`, requestOptions);
+  }
+
+  async associateGroup(groupId: number, init?: RequestInit | undefined): Promise<void> {
+    const requestOptions: RequestInit = {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: init?.body,
+    };
+    return this.fetch(`${this.group_url}/${groupId}/associate`, requestOptions);
   }
 
   async addUser(addUserData: AddUserData, init?: RequestInit | undefined): Promise<Group> {
@@ -162,7 +190,14 @@ export default class Api {
 
     return fetch(input, mergedInit).then((res) => {
       if (res.ok) {
-        return res.json();
+        const contentType = res.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          return res.json();
+        }
+        return res.text().then((text) => ({
+          contentType,
+          body: text,
+        }));
       }
       switch (res.status) {
         case 401: {

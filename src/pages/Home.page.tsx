@@ -1,11 +1,17 @@
+import { Button, Group } from '@mantine/core';
+import { useNavigate } from 'react-router-dom';
 import { Welcome } from '../components/Welcome/Welcome';
-import { ColorSchemeToggle } from '../components/ColorSchemeToggle/ColorSchemeToggle';
+import { SIGNIN, SIGNUP } from '@/routes';
 
 export function HomePage() {
+  const navigate = useNavigate();
   return (
     <>
       <Welcome />
-      <ColorSchemeToggle />
+      <Group justify="center">
+        <Button onClick={() => navigate(SIGNIN)}>Sign in</Button>
+        <Button onClick={() => navigate(SIGNUP)}>Sign up</Button>
+      </Group>
     </>
   );
 }

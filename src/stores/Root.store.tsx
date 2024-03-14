@@ -30,6 +30,7 @@ export interface User {
 
 export interface Pizza {
   id: number;
+  groupId: number;
   description: string;
   santaMembership: Membership;
   receiverMembership: Membership;
@@ -41,6 +42,7 @@ export class RootStore {
   public currentUser: User | undefined = undefined;
   public groups: Group[] = [];
   private users: User[] = [];
+  private pizzas: Pizza[] = [];
 
   constructor() {
     this.api = new Api('http://localhost:3000');
@@ -50,11 +52,34 @@ export class RootStore {
   public reset(): void {
     this.groups = [];
     this.users = [];
+    this.pizzas = [];
     this.currentUser = undefined;
   }
 
   public groupById(id: number): number {
     return this.groups.findIndex((group) => group.id === id);
+  }
+
+  public updateGroups(updatedGroups: Group[]): void {
+    updatedGroups.forEach((updatedGroup) => {
+      const index = this.groups.findIndex((group) => group.id === updatedGroup.id);
+      if (index !== -1) {
+        this.groups[index] = updatedGroup;
+      } else {
+        this.groups.push(updatedGroup);
+      }
+    });
+  }
+
+  deleteGroup(groupId: number): void {
+    const index = this.groups.findIndex((group) => group.id === groupId);
+
+    if (index !== -1) {
+      runInAction(() => {
+        this.groups.splice(index, 1);
+        console.log(this.groups);
+      });
+    }
   }
 
   public userByName(username: string): User | undefined {
@@ -67,6 +92,21 @@ export class RootStore {
         this.users[index] = updatedUser;
       } else {
         this.users.push(updatedUser);
+      }
+    });
+  }
+
+  public pizzaById(id: number): Pizza | undefined {
+    return this.pizzas.find((pizza) => pizza.id === id);
+  }
+
+  public updatePizza(updatedPizzas: Pizza[]): void {
+    updatedPizzas.forEach((updatedPizza) => {
+      const index = this.pizzas.findIndex((pizza) => pizza.id === updatedPizza.id);
+      if (index !== -1) {
+        this.pizzas[index] = updatedPizza;
+      } else {
+        this.pizzas.push(updatedPizza);
       }
     });
   }

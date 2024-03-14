@@ -1,5 +1,5 @@
-import { ActionIcon, Anchor, Badge, Button, Flex, Table, Text } from '@mantine/core';
-import { IconArrowUp, IconPlus, IconTrash } from '@tabler/icons-react';
+import { ActionIcon, Anchor, Avatar, Flex, Table, Text, Title } from '@mantine/core';
+import { IconArrowUp, IconTrash, IconUserPlus } from '@tabler/icons-react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import AvatarBadge from '@/components/AvatarBadge';
@@ -26,7 +26,7 @@ const GroupMembers = ({
     <Table.Tr key={membership.id}>
       <Table.Td>
         <Flex mih={50} gap="md" justify="flex-start" align="center" direction="row" wrap="wrap">
-          <AvatarBadge user={membership.user} />
+          <AvatarBadge user={membership.user} admin={membership.role === 'ADMIN'} />
           <Anchor onClick={() => navigate(`${USER}/${membership.user.username}`)}>
             <Text fz="sm" fw={500}>
               {membership.user.name}
@@ -35,17 +35,6 @@ const GroupMembers = ({
               @{membership.user.username}
             </Text>
           </Anchor>
-          {membership.role === 'ADMIN' ? (
-            <Badge
-              size="lg"
-              variant="gradient"
-              gradient={{ from: 'orange', to: 'yellow', deg: 90 }}
-            >
-              Admin
-            </Badge>
-          ) : (
-            <div />
-          )}
         </Flex>
       </Table.Td>
 
@@ -70,15 +59,18 @@ const GroupMembers = ({
             ) : (
               <> </>
             )}
-
-            <ActionIcon
-              variant="light"
-              color="red"
-              size="xl"
-              onClick={() => handleRemoveUser(membership.user.username)}
-            >
-              <IconTrash size={14} />
-            </ActionIcon>
+            {store.groups[indexStoredGroup].status === 'OPEN' ? (
+              <ActionIcon
+                variant="light"
+                color="red"
+                size="xl"
+                onClick={() => handleRemoveUser(membership.user.username)}
+              >
+                <IconTrash size={14} />
+              </ActionIcon>
+            ) : (
+              <></>
+            )}
           </Flex>
         ) : (
           <div />
@@ -88,14 +80,45 @@ const GroupMembers = ({
   ));
   return (
     <>
-      <Table.ScrollContainer minWidth={100}>
-        <Table verticalSpacing="sm" withRowBorders={false}>
-          <Table.Tbody>{rows}</Table.Tbody>
+      <Title order={3}>Members</Title>
+
+      <Table.ScrollContainer minWidth={100} py="md">
+        <Table verticalSpacing="sm" withRowBorders={false} highlightOnHover>
+          <Table.Tbody>
+            {rows}
+            <Table.Tr key="add" onClick={open} style={{ cursor: 'pointer' }}>
+              <Table.Td>
+                <Flex
+                  mih={50}
+                  gap="md"
+                  justify="flex-start"
+                  align="center"
+                  direction="row"
+                  wrap="wrap"
+                >
+                  <Avatar
+                    variant="default"
+                    color="gray"
+                    size="lg"
+                    radius="xl"
+                    aria-label="Add user"
+                    style={{ border: '1px dashed grey' }}
+                  >
+                    <IconUserPlus
+                      color="grey"
+                      style={{ width: '70%', height: '70%' }}
+                      stroke={1.5}
+                    />
+                  </Avatar>
+                  <Text c="grey">Add user</Text>
+                </Flex>
+              </Table.Td>
+              <Table.Td />
+            </Table.Tr>
+          </Table.Tbody>
         </Table>
       </Table.ScrollContainer>
-      <Button variant="light" onClick={open} leftSection={<IconPlus size={14} />}>
-        Add user
-      </Button>
+      <Flex px="10" onClick={open} style={{ cursor: 'pointer' }} />
     </>
   );
 };

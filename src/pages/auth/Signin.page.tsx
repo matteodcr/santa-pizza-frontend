@@ -8,7 +8,6 @@ import {
   Group,
   Paper,
   PasswordInput,
-  Text,
   TextInput,
   Title,
 } from '@mantine/core';
@@ -17,7 +16,7 @@ import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import classes from './Auth.module.css';
 import { useRootStore } from '@/stores/Root.store';
-import { DASHBOARD, SIGNUP } from '@/routes';
+import { DASHBOARD } from '@/routes';
 
 const Signin: React.FC = observer(() => {
   const navigate = useNavigate();
@@ -64,14 +63,8 @@ const Signin: React.FC = observer(() => {
   return (
     <Container size={420} my={40}>
       <Title ta="center" className={classes.title}>
-        Welcome back!
+        Hello!
       </Title>
-      <Text c="dimmed" size="sm" ta="center" mt={5}>
-        Do not have an account yet?{' '}
-        <Anchor size="sm" component="button" onClick={() => navigate(SIGNUP)}>
-          Create account
-        </Anchor>
-      </Text>
 
       <Paper withBorder shadow="md" p={30} mt={30} radius="md">
         <form onSubmit={form.onSubmit((values) => console.log(values))}>

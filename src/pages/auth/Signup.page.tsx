@@ -1,15 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import {
-  Anchor,
-  Button,
-  Container,
-  Paper,
-  PasswordInput,
-  Text,
-  TextInput,
-  Title,
-} from '@mantine/core';
+import { Button, Container, Paper, PasswordInput, TextInput, Title } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from '@mantine/form';
 import classes from './Auth.module.css';
@@ -61,14 +52,8 @@ const Signup: React.FC = observer(() => {
   return (
     <Container size={420} my={40}>
       <Title ta="center" className={classes.title}>
-        Welcome back!
+        Welcome!
       </Title>
-      <Text c="dimmed" size="sm" ta="center" mt={5}>
-        Already have an account?
-        <Anchor size="sm" component="button" onClick={() => navigate(SIGNIN)}>
-          Sign in
-        </Anchor>
-      </Text>
 
       <Paper withBorder shadow="md" p={30} mt={30} radius="md">
         <TextInput

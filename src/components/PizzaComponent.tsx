@@ -2,8 +2,10 @@ import React from 'react';
 import { ActionIcon, Container, Divider, Flex, Group, Text, Title } from '@mantine/core';
 import { observer } from 'mobx-react';
 import { IconPizza } from '@tabler/icons-react';
+import { useNavigate } from 'react-router-dom';
 import { useRootStore } from '@/stores/Root.store';
 import AvatarBadge from '@/components/AvatarBadge';
+import { PIZZA } from '@/routes';
 
 interface PizzaComponentProps {
   indexStoredGroup: number;
@@ -11,6 +13,7 @@ interface PizzaComponentProps {
 
 const PizzaComponent: React.FC<PizzaComponentProps> = observer(({ indexStoredGroup }) => {
   const store = useRootStore();
+  const navigate = useNavigate();
 
   const demoProps = {
     w: '38vw',
@@ -21,6 +24,7 @@ const PizzaComponent: React.FC<PizzaComponentProps> = observer(({ indexStoredGro
   console.log(santaMembership);
   return (
     <>
+      <Divider my="md" />
       {store.currentUser ? (
         <Group justify="center" gap="sm" px={0} grow>
           {santaMembership ? (
@@ -37,13 +41,19 @@ const PizzaComponent: React.FC<PizzaComponentProps> = observer(({ indexStoredGro
               color="grey"
               mx={-10}
               label={
-                <ActionIcon variant="light" color="red" size="xl" aria-label="Settings">
+                <ActionIcon
+                  variant="light"
+                  color={santaMembership?.santaPizza.status === 'ASSOCIATED' ? 'red' : 'green'}
+                  size="xl"
+                  aria-label="Settings"
+                  onClick={() => navigate(`${PIZZA}/${santaMembership?.santaPizza.id}`)}
+                >
                   <IconPizza style={{ width: '70%', height: '70%' }} stroke={1.5} />
                 </ActionIcon>
               }
             />
           </Container>
-          {santaMembership ? (
+          {santaMembership?.santaPizza?.receiverMembership ? (
             <Flex mih={50} gap="md" justify="center" align="center" direction="column" wrap="wrap">
               <AvatarBadge
                 user={santaMembership.santaPizza.receiverMembership.user}

@@ -1,4 +1,14 @@
-import { Anchor, Avatar, Group, HoverCard, Text } from '@mantine/core';
+import {
+  Anchor,
+  Avatar,
+  Group,
+  HoverCard,
+  Indicator,
+  Text,
+  Title,
+  Tooltip,
+  useMantineTheme,
+} from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import React from 'react';
 import { User } from '@/stores/Root.store';
@@ -8,15 +18,17 @@ import getInitials from '@/utils/initials';
 interface AvatarBadgeProps {
   user: User;
   avatarSize?: number;
+  admin?: boolean;
 }
 
-export default function AvatarBadge({ user, avatarSize }: AvatarBadgeProps) {
+export default function AvatarBadge({ user, avatarSize, admin }: AvatarBadgeProps) {
   const navigate = useNavigate();
   const truncatedDescription = user.description
     ? user.description.length > 30
       ? `${user.description.substring(0, 30)}...`
       : user.description
     : '';
+  const theme = useMantineTheme();
   return (
     <Group
       justify="center"
@@ -28,7 +40,24 @@ export default function AvatarBadge({ user, avatarSize }: AvatarBadgeProps) {
     >
       <HoverCard width={320} shadow="md" withArrow openDelay={200} closeDelay={400}>
         <HoverCard.Target>
-          <Avatar size={avatarSize || 'md'}>{getInitials(user.name)}</Avatar>
+          <Indicator
+            style={{ zIndex: 0 }}
+            color="transparent"
+            position="top-center"
+            label={
+              <Tooltip label="👑 Admin 👑">
+                <Title order={3}>👑</Title>
+              </Tooltip>
+            }
+            disabled={!admin}
+          >
+            <Avatar
+              size={avatarSize || 'lg'}
+              style={admin ? { border: `2px solid ${theme.colors.orange[4]}` } : {}}
+            >
+              {getInitials(user.name)}
+            </Avatar>
+          </Indicator>
         </HoverCard.Target>
         <HoverCard.Dropdown>
           <Anchor style={{ flex: 1 }} onClick={() => navigate(`${USER}/${user.username}`)}>
