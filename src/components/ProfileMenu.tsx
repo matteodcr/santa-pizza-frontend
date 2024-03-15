@@ -28,7 +28,11 @@ export const ProfileMenu = observer(() => {
         <Menu.Target>
           <Button variant="default">
             <Group gap={7}>
-              <Avatar variant="filled" size={30 || 'md'}>
+              <Avatar
+                src={`${store.api.base_url}/${store.currentUser?.avatarUrl}`}
+                variant="filled"
+                size={30 || 'md'}
+              >
                 {getInitials(store.currentUser?.username)}
               </Avatar>
               <Text fw={500} size="sm" lh={1} mr={3}>

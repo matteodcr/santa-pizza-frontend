@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { observer } from 'mobx-react';
-import { Alert, Avatar, Paper, Text } from '@mantine/core';
+import { Alert, Avatar, Button, Center, Group, Paper, Text } from '@mantine/core';
 import { useNavigate, useParams } from 'react-router-dom';
-import { IconInfoCircle } from '@tabler/icons-react';
+import { IconInfoCircle, IconPencil } from '@tabler/icons-react';
 import { useRootStore } from '@/stores/Root.store';
 import { USER } from '@/routes';
 import getInitials from '@/utils/initials';
@@ -28,9 +28,11 @@ const UserPage: React.FC = observer(() => {
 
   return user ? (
     <Paper radius="md" withBorder p="lg" bg="var(--mantine-color-body)">
-      <Avatar size="xl" radius={120} mx="auto">
-        {getInitials(user.name)}
-      </Avatar>
+      <Center>
+        <Avatar size={200} src={`${store.api.base_url}/${user?.avatarUrl}`}>
+          {getInitials(user.name)}
+        </Avatar>
+      </Center>
       <Text ta="center" fz="lg" fw={500} mt="md">
         {user.name}
       </Text>
@@ -40,7 +42,14 @@ const UserPage: React.FC = observer(() => {
       <h3>Description</h3>
       {user.description}
       <h3>Allergies</h3>
-      {user.allergies}
+      <ul>{user.allergies?.map((allergy, index) => <li key={index}>{allergy}</li>)}</ul>
+      {user.username === store.currentUser?.username && (
+        <Group mt="lg" justify="center">
+          <Button leftSection={<IconPencil />} onClick={() => navigate(`${USER}/me/modify`)}>
+            Edit profile
+          </Button>
+        </Group>
+      )}
     </Paper>
   ) : (
     <Text>Loading...</Text>

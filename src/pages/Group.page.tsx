@@ -9,17 +9,19 @@ import {
   Flex,
   Group,
   Modal,
+  Space,
   Text,
   TextInput,
   Title,
   Tooltip,
   UnstyledButton,
+  useMantineColorScheme,
 } from '@mantine/core';
-import { useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { runInAction } from 'mobx';
 import { notifications } from '@mantine/notifications';
 import { useDisclosure } from '@mantine/hooks';
-import { IconCross, IconSettings, IconX } from '@tabler/icons-react';
+import { IconCross, IconSettings, IconUpload, IconX } from '@tabler/icons-react';
 import { useRootStore } from '@/stores/Root.store';
 import PizzaComponent from '@/components/PizzaComponent';
 import GroupMembers from '@/components/GroupMembers';
@@ -32,8 +34,17 @@ const GroupPage: React.FC = observer(() => {
   const indexStoredGroup = store.groupById(Number(id));
   const [openedModal, setModal] = useDisclosure(false);
   const [openDescription, { open, close }] = useDisclosure(false);
-
   const [username, setUsername] = React.useState('');
+  const { colorScheme } = useMantineColorScheme();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const imageBackground = () => {
+    if (colorScheme === 'light') {
+      return 'rgba(255, 255, 255, 0.6)';
+    }
+    return 'rgba(0, 0, 0, 0.6)';
+  };
 
   async function fetchData() {
     const updatedGroup = await store.api.fetchGroup(Number(id));
@@ -131,12 +142,21 @@ const GroupPage: React.FC = observer(() => {
             mih={50}
             gap="md"
             justify="flex-end"
-            align="flex-start"
+            align="flex-end"
             direction="column"
             wrap="wrap"
             h="100%"
           >
-            <Box p="1em" style={{ borderRadius: '0px 20px 0px 0px' }} />
+            <Box
+              p="0.2em"
+              style={{ borderRadius: '10px 0px 100% 0px', backgroundColor: imageBackground() }}
+            >
+              <UnstyledButton>
+                <Group>
+                  <IconUpload /> Upload <Space />
+                </Group>
+              </UnstyledButton>
+            </Box>
           </Flex>
         </BackgroundImage>
       </Box>
@@ -165,7 +185,11 @@ const GroupPage: React.FC = observer(() => {
         ) : (
           <Button leftSection={<IconX />}>Close Group</Button>
         )}
-        <Button variant="light" leftSection={<IconSettings />}>
+        <Button
+          variant="light"
+          leftSection={<IconSettings />}
+          onClick={() => navigate(`${location.pathname}/modify`)}
+        >
           Settings
         </Button>
       </Group>

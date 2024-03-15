@@ -11,7 +11,7 @@ import {
 } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import React from 'react';
-import { User } from '@/stores/Root.store';
+import { User, useRootStore } from '@/stores/Root.store';
 import { USER } from '@/routes';
 import getInitials from '@/utils/initials';
 
@@ -23,6 +23,7 @@ interface AvatarBadgeProps {
 
 export default function AvatarBadge({ user, avatarSize, admin }: AvatarBadgeProps) {
   const navigate = useNavigate();
+  const store = useRootStore();
   const truncatedDescription = user.description
     ? user.description.length > 30
       ? `${user.description.substring(0, 30)}...`
@@ -53,6 +54,7 @@ export default function AvatarBadge({ user, avatarSize, admin }: AvatarBadgeProp
           >
             <Avatar
               size={avatarSize || 'lg'}
+              src={`${store.api.base_url}/${user?.avatarUrl}`}
               style={admin ? { border: `2px solid ${theme.colors.orange[4]}` } : {}}
             >
               {getInitials(user.name)}

@@ -29,6 +29,12 @@ export interface RemoveUserData {
 }
 
 export interface UpdateUserData {
+  name: string;
+  description: string;
+  allergies: string[];
+}
+
+export interface ChangeRoleData {
   groupId: number;
   username: string;
   role: string;
@@ -37,6 +43,7 @@ export interface UpdateUserData {
 export default class Api {
   public onDisconnectedHandler: (() => void) | null = null;
 
+  public readonly base_url: string;
   private readonly signin_url: string;
   private readonly signup_url: string;
   private readonly group_url: string;
@@ -45,6 +52,7 @@ export default class Api {
   private readonly pizza_url: string;
 
   constructor(baseUrl: string) {
+    this.base_url = baseUrl;
     this.signin_url = `${baseUrl}/auth/signin`;
     this.signup_url = `${baseUrl}/auth/signup`;
     this.group_url = `${baseUrl}/group`;
@@ -141,6 +149,51 @@ export default class Api {
     return this.fetch(`${this.group_url}/${groupId}/associate`, requestOptions);
   }
 
+  async updateGroupName(
+    groupId: number,
+    form: { name: string },
+    init?: RequestInit | undefined
+  ): Promise<void> {
+    const requestOptions: RequestInit = {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(form),
+    };
+    return this.fetch(`${this.group_url}/${groupId}/name`, requestOptions);
+  }
+
+  async updateGroupDescription(
+    groupId: number,
+    form: { description: string },
+    init?: RequestInit | undefined
+  ): Promise<void> {
+    const requestOptions: RequestInit = {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(form),
+    };
+    return this.fetch(`${this.group_url}/${groupId}/description`, requestOptions);
+  }
+
+  async updateGroupDate(
+    groupId: number,
+    form: { dueDate: string },
+    init?: RequestInit | undefined
+  ): Promise<void> {
+    const requestOptions: RequestInit = {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(form),
+    };
+    return this.fetch(`${this.group_url}/${groupId}/date`, requestOptions);
+  }
+
   async addUser(addUserData: AddUserData, init?: RequestInit | undefined): Promise<Group> {
     const requestOptions: RequestInit = {
       method: 'POST',
@@ -163,7 +216,18 @@ export default class Api {
     return this.fetch(`${this.membership_url}/remove`, requestOptions);
   }
 
-  async changeRole(updateUserData: UpdateUserData, init?: RequestInit | undefined): Promise<Group> {
+  async updateUser(updateUserData: UpdateUserData, init?: RequestInit | undefined): Promise<void> {
+    const requestOptions: RequestInit = {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updateUserData),
+    };
+    return this.fetch(`${this.user_url}/modify`, requestOptions);
+  }
+
+  async changeRole(updateUserData: ChangeRoleData, init?: RequestInit | undefined): Promise<Group> {
     const requestOptions: RequestInit = {
       method: 'PATCH',
       headers: {

@@ -12,16 +12,6 @@ const CreateGroupPage: React.FC = observer(() => {
   const store = useRootStore();
   const navigate = useNavigate();
 
-  const handleCreateGroup = async () => {
-    const createGroupData: CreateGroupData = {
-      ...form.values,
-      dueDate: form.values.dueDate.toISOString(),
-    };
-
-    await store.api.createGroup(createGroupData);
-    navigate(DASHBOARD);
-  };
-
   const form = useForm({
     initialValues: {
       name: '',
@@ -43,6 +33,16 @@ const CreateGroupPage: React.FC = observer(() => {
       },
     },
   });
+
+  const handleCreateGroup = async () => {
+    const createGroupData: CreateGroupData = {
+      ...form.values,
+      dueDate: form.values.dueDate.toISOString(),
+    };
+
+    await store.api.createGroup(createGroupData);
+    navigate(DASHBOARD);
+  };
 
   return (
     <>

@@ -25,6 +25,7 @@ export interface User {
   username: string;
   name?: string;
   description?: string;
+  avatarUrl?: string;
   allergies?: string[];
 }
 
