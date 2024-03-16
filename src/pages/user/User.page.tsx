@@ -11,12 +11,12 @@ const UserPage: React.FC = observer(() => {
   const store = useRootStore();
   const navigate = useNavigate();
   const { username } = useParams();
-  const user = store.userByName(username!);
+  const user = store.userStore.getUserByUsername(username!);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        store.updateUser([await store.api.fetchUser(username!)]);
+        await store.loadUser(username!);
       } catch (e) {
         if ((e as Response).status === 404) {
           navigate(`${USER}/404`, { replace: true });
@@ -27,9 +27,9 @@ const UserPage: React.FC = observer(() => {
   }, [store.api]);
 
   return user ? (
-    <Paper radius="md" withBorder p="lg" bg="var(--mantine-color-body)">
+    <Paper radius="md" p="lg" bg="var(--mantine-color-body)">
       <Center>
-        <Avatar size={200} src={store.avatarUrl}>
+        <Avatar size={200} src={user.avatarUrl}>
           {getInitials(user.name)}
         </Avatar>
       </Center>
@@ -43,7 +43,7 @@ const UserPage: React.FC = observer(() => {
       {user.description}
       <h3>Allergies</h3>
       <ul>{user.allergies?.map((allergy, index) => <li key={index}>{allergy}</li>)}</ul>
-      {user.username === store.currentUser?.username && (
+      {user.username === store.userStore.getCurrentUser()?.username && (
         <Group mt="lg" justify="center">
           <Button leftSection={<IconPencil />} onClick={() => navigate(`${USER}/me/modify`)}>
             Edit profile

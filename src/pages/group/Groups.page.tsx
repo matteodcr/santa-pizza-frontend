@@ -2,22 +2,21 @@ import React, { useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import { Button, SimpleGrid, Text } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
-import { runInAction } from 'mobx';
 import { IconPlus } from '@tabler/icons-react';
 import { useRootStore } from '@/stores/Root.store';
 import { GROUP } from '@/routes';
-import GroupCard from '@/components/GroupCard';
+import GroupCard from '@/components/Group/GroupCard';
 
-const DashboardPage: React.FC = observer(() => {
+const GroupsPage: React.FC = observer(() => {
   const store = useRootStore();
   const navigate = useNavigate();
 
+  const { groups } = store.groupStore;
+
   useEffect(() => {
     async function fetchData() {
-      const groups = await store.api.fetchGroups();
-      runInAction(() => {
-        store.groups = groups;
-      });
+      const updatedGroups = await store.api.fetchGroups();
+      store.groupStore.updateGroups(updatedGroups);
     }
     fetchData();
   }, [store.api]);
@@ -32,9 +31,9 @@ const DashboardPage: React.FC = observer(() => {
         New group
       </Button>
 
-      {store.groups ? (
+      {groups ? (
         <SimpleGrid cols={2} py="1em">
-          {store.groups.map((group) => (group ? <GroupCard key={group.id} group={group} /> : null))}
+          {groups.map((group) => (group ? <GroupCard key={group.id} group={group} /> : null))}
         </SimpleGrid>
       ) : (
         <Text>No groups</Text>
@@ -43,4 +42,4 @@ const DashboardPage: React.FC = observer(() => {
   );
 });
 
-export default DashboardPage;
+export default GroupsPage;

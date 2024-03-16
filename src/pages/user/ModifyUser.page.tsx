@@ -16,15 +16,17 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from '@mantine/form';
 import { useRootStore } from '@/stores/Root.store';
 import { USER } from '@/routes';
-import { UpdateUserData } from '@/stores/ApiStore';
+import { UpdateUserData } from '@/stores/Api.store';
 import 'react-advanced-cropper/dist/style.css';
-import CropProfilePicture from '@/components/CropProfilePicture';
+import CropProfilePicture from '@/components/User/CropProfilePicture';
 import getInitials from '@/utils/initials';
 
 const ModifyUserPage: React.FC = observer(() => {
   const store = useRootStore();
   const navigate = useNavigate();
   const [allergies, setAllergies] = useState<string[]>([]);
+
+  const user = store.userStore.getCurrentUser();
 
   const form = useForm({
     initialValues: {
@@ -35,14 +37,14 @@ const ModifyUserPage: React.FC = observer(() => {
 
   async function fetchData() {
     await store.loadCurrentUser();
-    if (store.currentUser?.name) {
-      form.setFieldValue('name', store.currentUser.name);
+    if (user?.name) {
+      form.setFieldValue('name', user?.name);
     }
-    if (store.currentUser?.description) {
-      form.setFieldValue('description', store.currentUser.description);
+    if (user?.description) {
+      form.setFieldValue('description', user?.description);
     }
-    if (store.currentUser?.allergies) {
-      setAllergies(store.currentUser.allergies);
+    if (user?.allergies) {
+      setAllergies(user?.allergies);
     }
   }
   useEffect(() => {
@@ -54,9 +56,9 @@ const ModifyUserPage: React.FC = observer(() => {
       ...form.values,
       allergies,
     };
-
     await store.api.updateUser(updateUserData);
-    navigate(`${USER}/${store.currentUser?.username}`);
+
+    navigate(`${USER}/${user?.username}`);
   };
 
   return (
@@ -66,9 +68,9 @@ const ModifyUserPage: React.FC = observer(() => {
           Edit user profile
         </Title>
         <Stack align="center">
-          {store.currentUser ? (
-            <Avatar size={200} src={store.avatarUrl}>
-              {getInitials(store.currentUser?.name)}
+          {user ? (
+            <Avatar size={200} src={user.avatarUrl}>
+              {getInitials(user?.name)}
             </Avatar>
           ) : (
             <Skeleton height={200} circle mb="xl" />
@@ -100,7 +102,7 @@ const ModifyUserPage: React.FC = observer(() => {
             <Button
               px="md"
               variant="outline"
-              onClick={() => navigate(`${USER}/${store.currentUser?.username}`)}
+              onClick={() => navigate(`${USER}/${user?.username}`)}
               mt="md"
             >
               Cancel

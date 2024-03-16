@@ -4,20 +4,19 @@ import { useMediaQuery } from '@mantine/hooks';
 import { AppShell, em } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { HomePage } from './pages/Home.page';
-import { DASHBOARD, GROUP, PIZZA, SIGNIN, SIGNOUT, SIGNUP, USER } from '@/routes';
+import { DASHBOARD, GROUP, SIGNIN, SIGNOUT, SIGNUP, USER } from '@/routes';
 import { useRootStore } from '@/stores/Root.store';
-import UserPage from '@/pages/User.page';
-import GroupPage from '@/pages/Group.page';
-import DashboardPage from '@/pages/Dashboard.page';
-import CreateGroupPage from '@/pages/CreateGroup.page';
-import { Header } from '@/components/Header';
-import PizzaPage from '@/pages/Pizza.page';
+import UserPage from '@/pages/user/User.page';
+import GroupPage from '@/pages/group/Group.page';
+import GroupsPage from '@/pages/group/Groups.page';
+import CreateGroupPage from '@/pages/group/CreateGroup.page';
+import { Header } from '@/components/Shell/Header';
 import Signin from '@/pages/auth/Signin.page';
 import Signup from '@/pages/auth/Signup.page';
 import Signout from '@/pages/auth/Signout.page';
-import { Footer } from '@/components/Footer';
-import ModifyGroupPage from '@/pages/ModifyGroup.page';
-import ModifyUserPage from '@/pages/ModifyUser.page';
+import { Footer } from '@/components/Shell/Footer';
+import ModifyGroupPage from '@/pages/group/ModifyGroup.page';
+import ModifyUserPage from '@/pages/user/ModifyUser.page';
 
 export function Router() {
   const paddingPercentage = useMediaQuery(`(max-width: ${em(750)})`) ? '5%' : '20%';
@@ -61,13 +60,12 @@ export function Router() {
             <Route path={SIGNIN} element={<Signin />} />
             <Route path={SIGNUP} element={<Signup />} />
             <Route path={SIGNOUT} element={<Signout />} />
-            <Route path={DASHBOARD} element={<DashboardPage />} />
+            <Route path={DASHBOARD} element={<GroupsPage />} />
             <Route path={`${GROUP}/:id`} element={<GroupPage />} />
             <Route path={`${GROUP}/:id/modify`} element={<ModifyGroupPage />} />
             <Route path={`${GROUP}/create`} element={<CreateGroupPage />} />
             <Route path={`${USER}/:username`} element={<UserPage />} />
             <Route path={`${USER}/me/modify`} element={<ModifyUserPage />} />
-            <Route path={`${PIZZA}/:id`} element={<PizzaPage />} />
           </Routes>
           <Notifications position="bottom-right" />
         </AppShell.Main>

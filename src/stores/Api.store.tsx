@@ -1,4 +1,6 @@
-import { Group, Pizza, User } from '@/stores/Root.store';
+import { Group } from '@/stores/entity/Group';
+import { User } from '@/stores/entity/User';
+import { Membership } from '@/stores/entity/Membership';
 
 export interface SignUpData {
   username: string;
@@ -95,28 +97,21 @@ export default class Api {
   }
 
   async fetchGroups(init?: RequestInit | undefined): Promise<Group[]> {
-    return this.fetch(this.group_url, init);
+    return (await this.fetch(this.group_url, init)).map((group: any) => new Group(group));
   }
   async fetchGroup(groupiId: number, init?: RequestInit | undefined): Promise<Group> {
-    return this.fetch(`${this.group_url}/${groupiId}`, init);
+    return new Group(await this.fetch(`${this.group_url}/${groupiId}`, init));
   }
 
   async fetchCurrentUser(init?: RequestInit | undefined): Promise<User> {
-    return this.fetch(`${this.user_url}/me`, init);
+    return new User(await this.fetch(`${this.user_url}/me`, init));
   }
 
   async fetchUser(username: string, init?: RequestInit | undefined): Promise<User> {
-    return this.fetch(`${this.user_url}/${username}`, init);
+    return new User(await this.fetch(`${this.user_url}/${username}`, init));
   }
 
-  async fetchPizza(pizzaId: number, init?: RequestInit | undefined): Promise<Pizza> {
-    return this.fetch(`${this.pizza_url}/${pizzaId}`, init);
-  }
-
-  async createGroup(
-    createGroupData: CreateGroupData,
-    init?: RequestInit | undefined
-  ): Promise<Group> {
+  async createGroup(createGroupData: CreateGroupData): Promise<Group> {
     const requestOptions: RequestInit = {
       method: 'POST',
       headers: {
@@ -124,8 +119,7 @@ export default class Api {
       },
       body: JSON.stringify(createGroupData),
     };
-    console.log('test');
-    return this.fetch(`${this.group_url}`, requestOptions);
+    return new Group(await this.fetch(`${this.group_url}`, requestOptions));
   }
 
   async deleteGroup(groupId: number, init?: RequestInit | undefined): Promise<void> {
@@ -150,11 +144,7 @@ export default class Api {
     return this.fetch(`${this.group_url}/${groupId}/associate`, requestOptions);
   }
 
-  async updateGroupName(
-    groupId: number,
-    form: { name: string },
-    init?: RequestInit | undefined
-  ): Promise<void> {
+  async updateGroupName(groupId: number, form: { name: string }): Promise<Group> {
     const requestOptions: RequestInit = {
       method: 'PATCH',
       headers: {
@@ -162,14 +152,10 @@ export default class Api {
       },
       body: JSON.stringify(form),
     };
-    return this.fetch(`${this.group_url}/${groupId}/name`, requestOptions);
+    return new Group(await this.fetch(`${this.group_url}/${groupId}/name`, requestOptions));
   }
 
-  async updateGroupDescription(
-    groupId: number,
-    form: { description: string },
-    init?: RequestInit | undefined
-  ): Promise<void> {
+  async updateGroupDescription(groupId: number, form: { description: string }): Promise<Group> {
     const requestOptions: RequestInit = {
       method: 'PATCH',
       headers: {
@@ -177,14 +163,10 @@ export default class Api {
       },
       body: JSON.stringify(form),
     };
-    return this.fetch(`${this.group_url}/${groupId}/description`, requestOptions);
+    return new Group(await this.fetch(`${this.group_url}/${groupId}/description`, requestOptions));
   }
 
-  async updateGroupDate(
-    groupId: number,
-    form: { dueDate: string },
-    init?: RequestInit | undefined
-  ): Promise<void> {
+  async updateGroupDate(groupId: number, form: { dueDate: string }): Promise<Group> {
     const requestOptions: RequestInit = {
       method: 'PATCH',
       headers: {
@@ -192,10 +174,10 @@ export default class Api {
       },
       body: JSON.stringify(form),
     };
-    return this.fetch(`${this.group_url}/${groupId}/date`, requestOptions);
+    return new Group(await this.fetch(`${this.group_url}/${groupId}/date`, requestOptions));
   }
 
-  async addUser(addUserData: AddUserData, init?: RequestInit | undefined): Promise<Group> {
+  async addUser(addUserData: AddUserData): Promise<Group> {
     const requestOptions: RequestInit = {
       method: 'POST',
       headers: {
@@ -203,10 +185,10 @@ export default class Api {
       },
       body: JSON.stringify(addUserData),
     };
-    return this.fetch(`${this.membership_url}/add`, requestOptions);
+    return new Group(await this.fetch(`${this.membership_url}/add`, requestOptions));
   }
 
-  async removeUser(removeUserData: RemoveUserData, init?: RequestInit | undefined): Promise<Group> {
+  async removeUser(removeUserData: RemoveUserData): Promise<void> {
     const requestOptions: RequestInit = {
       method: 'DELETE',
       headers: {
@@ -217,7 +199,7 @@ export default class Api {
     return this.fetch(`${this.membership_url}/remove`, requestOptions);
   }
 
-  async updateUser(updateUserData: UpdateUserData, init?: RequestInit | undefined): Promise<void> {
+  async updateUser(updateUserData: UpdateUserData): Promise<Membership> {
     const requestOptions: RequestInit = {
       method: 'PATCH',
       headers: {
@@ -225,10 +207,10 @@ export default class Api {
       },
       body: JSON.stringify(updateUserData),
     };
-    return this.fetch(`${this.user_url}/modify`, requestOptions);
+    return new User(await this.fetch(`${this.user_url}/modify`, requestOptions));
   }
 
-  async updateAvatar(formData: FormData, init?: RequestInit | undefined): Promise<void> {
+  async updateAvatar(formData: FormData): Promise<void> {
     const requestOptions: RequestInit = {
       method: 'POST',
       body: formData,
@@ -236,7 +218,7 @@ export default class Api {
     return this.fetch(`${this.user_url}/upload`, requestOptions);
   }
 
-  async changeRole(updateUserData: ChangeRoleData, init?: RequestInit | undefined): Promise<Group> {
+  async changeRole(updateUserData: ChangeRoleData): Promise<Membership> {
     const requestOptions: RequestInit = {
       method: 'PATCH',
       headers: {
@@ -244,7 +226,7 @@ export default class Api {
       },
       body: JSON.stringify(updateUserData),
     };
-    return this.fetch(`${this.membership_url}/update`, requestOptions);
+    return new Membership(await this.fetch(`${this.membership_url}/update`, requestOptions));
   }
 
   private async fetch(input: RequestInfo, init?: RequestInit | undefined): Promise<any | null> {
@@ -281,6 +263,7 @@ export default class Api {
           return null;
         }
         default:
+          //TODO throw real errors
           throw res;
       }
     });

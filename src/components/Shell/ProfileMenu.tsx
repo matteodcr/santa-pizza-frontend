@@ -13,7 +13,7 @@ export const ProfileMenu = observer(() => {
   const navigate = useNavigate();
   const [userMenuOpened, setUserMenuOpened] = useState(false);
 
-  const user = store.currentUser;
+  const currentUser = store.userStore.getCurrentUser();
 
   return (
     <div className={classes.header}>
@@ -28,11 +28,11 @@ export const ProfileMenu = observer(() => {
         <Menu.Target>
           <Button variant="default">
             <Group gap={7}>
-              <Avatar src={store.avatarUrl} variant="filled" size={30 || 'md'}>
-                {getInitials(store.currentUser?.username)}
+              <Avatar src={currentUser?.avatarUrl} variant="filled" size={30 || 'md'}>
+                {getInitials(currentUser?.username)}
               </Avatar>
               <Text fw={500} size="sm" lh={1} mr={3}>
-                {user?.username}
+                {currentUser?.username}
               </Text>
               <IconChevronDown style={{ width: rem(12), height: rem(12) }} stroke={1.5} />
             </Group>
@@ -40,7 +40,7 @@ export const ProfileMenu = observer(() => {
         </Menu.Target>
         <Menu.Dropdown>
           <Menu.Item
-            onClick={() => navigate(`${USER}/${user?.username}`)}
+            onClick={() => navigate(`${USER}/${currentUser?.username}`)}
             leftSection={<IconUser style={{ width: rem(16), height: rem(16) }} stroke={1.5} />}
           >
             Your profile

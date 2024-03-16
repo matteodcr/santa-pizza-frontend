@@ -1,6 +1,6 @@
 import { Button, Group } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
-import { Welcome } from '../components/Welcome/Welcome';
+import { Welcome } from '@/components/Welcome/Welcome';
 import { SIGNIN, SIGNUP } from '@/routes';
 
 export function HomePage() {

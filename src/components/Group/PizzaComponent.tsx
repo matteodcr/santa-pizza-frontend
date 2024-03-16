@@ -1,35 +1,38 @@
 import React from 'react';
-import { ActionIcon, Container, Divider, Flex, Group, Text, Title } from '@mantine/core';
+import { Container, Divider, Flex, Group as GroupUI, Text, Title } from '@mantine/core';
 import { observer } from 'mobx-react';
-import { IconPizza } from '@tabler/icons-react';
-import { useNavigate } from 'react-router-dom';
 import { useRootStore } from '@/stores/Root.store';
 import AvatarBadge from '@/components/AvatarBadge';
-import { PIZZA } from '@/routes';
+import { Group } from '@/stores/entity/Group';
+import { Membership } from '@/stores/entity/Membership';
 
 interface PizzaComponentProps {
-  indexStoredGroup: number;
+  group: Group;
 }
 
-const PizzaComponent: React.FC<PizzaComponentProps> = observer(({ indexStoredGroup }) => {
+const PizzaComponent: React.FC<PizzaComponentProps> = observer(({ group }: PizzaComponentProps) => {
   const store = useRootStore();
-  const navigate = useNavigate();
 
   const demoProps = {
     w: '38vw',
     position: 'relative',
   };
 
-  const santaMembership = store.getUserMembership(indexStoredGroup);
-  console.log(santaMembership);
+  const currentUser = store.userStore.getCurrentUser();
+
+  let santaMembership: Membership | undefined;
+  if (currentUser) {
+    santaMembership = store.groupStore.getUserMembership(group, currentUser);
+  }
+
   return (
     <>
       <Divider my="md" />
-      {store.currentUser ? (
-        <Group justify="center" gap="sm" px={0} grow>
+      {currentUser ? (
+        <GroupUI justify="center" gap="sm" px={0} grow>
           {santaMembership ? (
             <Flex mih={50} gap="md" justify="center" align="center" direction="column" wrap="wrap">
-              <AvatarBadge user={santaMembership.user} avatarSize={100} />
+              <AvatarBadge user={santaMembership.user!} avatarSize={100} />
               <Title order={5}>Santa (You)</Title>
             </Flex>
           ) : (
@@ -40,23 +43,18 @@ const PizzaComponent: React.FC<PizzaComponentProps> = observer(({ indexStoredGro
               size={3}
               color="grey"
               mx={-10}
+              pb="1em"
               label={
-                <ActionIcon
-                  variant="light"
-                  color={santaMembership?.santaPizza.status === 'ASSOCIATED' ? 'red' : 'green'}
-                  size="xl"
-                  aria-label="Settings"
-                  onClick={() => navigate(`${PIZZA}/${santaMembership?.santaPizza.id}`)}
-                >
-                  <IconPizza style={{ width: '70%', height: '70%' }} stroke={1.5} />
-                </ActionIcon>
+                <Title pt="0.3em" mr="-0.35em" ml="-0.35em" size="8em">
+                  🍕
+                </Title>
               }
             />
           </Container>
           {santaMembership?.santaPizza?.receiverMembership ? (
             <Flex mih={50} gap="md" justify="center" align="center" direction="column" wrap="wrap">
               <AvatarBadge
-                user={santaMembership.santaPizza.receiverMembership.user}
+                user={santaMembership.santaPizza.receiverMembership.user!}
                 avatarSize={100}
               />
               <Title order={5}>Receiver</Title>
@@ -64,7 +62,7 @@ const PizzaComponent: React.FC<PizzaComponentProps> = observer(({ indexStoredGro
           ) : (
             <Text>No Santa</Text>
           )}
-        </Group>
+        </GroupUI>
       ) : (
         <Text>Loading...</Text>
       )}

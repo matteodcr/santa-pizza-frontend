@@ -4,7 +4,7 @@ import { Button } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { observer } from 'mobx-react';
 import { notifications } from '@mantine/notifications';
-import { IconX } from '@tabler/icons-react';
+import { IconCheck, IconX } from '@tabler/icons-react';
 import { useRootStore } from '@/stores/Root.store';
 
 export const CropProfilePicture = observer(() => {
@@ -25,12 +25,17 @@ export const CropProfilePicture = observer(() => {
         canvas.toBlob(
           async (blob) => {
             if (blob) {
-              console.log("Taille de l'image:", blob.size, 'octets');
               const formData = new FormData();
               formData.append('file', blob, 'image.jpg');
               try {
                 await store.api.updateAvatar(formData);
-                store.setCurrentAvatar(blob);
+                store.userStore.setCurrentAvatar(blob);
+                notifications.show({
+                  title: 'Success',
+                  message: 'Your avatar has been updated',
+                  color: 'green',
+                  icon: <IconCheck />,
+                });
               } catch (error) {
                 notifications.show({
                   title: 'Error',

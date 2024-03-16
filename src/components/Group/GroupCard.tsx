@@ -8,15 +8,15 @@ import {
   Menu,
   rem,
   Title,
-  useMantineColorScheme,
 } from '@mantine/core';
 import { observer } from 'mobx-react';
 import React from 'react';
 import { IconDots, IconTrash } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
-import { Group, useRootStore } from '@/stores/Root.store';
+import { useRootStore } from '@/stores/Root.store';
 import AvatarBadge from '@/components/AvatarBadge';
 import { GROUP } from '@/routes';
+import { Group } from '@/stores/entity/Group';
 
 interface GroupCardProps {
   group: Group;
@@ -25,12 +25,11 @@ interface GroupCardProps {
 const GroupCard = observer(({ group }: GroupCardProps) => {
   const navigate = useNavigate();
   const store = useRootStore();
-  const { colorScheme } = useMantineColorScheme();
 
   const handleDelete = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, id: number) => {
     e.stopPropagation();
     await store.api.deleteGroup(id);
-    store.deleteGroup(id);
+    store.groupStore.deleteGroup(id);
   };
   return (
     <Card

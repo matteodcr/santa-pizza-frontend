@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from '@mantine/form';
 import { DatePickerInput } from '@mantine/dates';
 import { useRootStore } from '@/stores/Root.store';
-import { CreateGroupData } from '@/stores/ApiStore';
+import { CreateGroupData } from '@/stores/Api.store';
 import { DASHBOARD } from '@/routes';
 
 const CreateGroupPage: React.FC = observer(() => {

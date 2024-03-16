@@ -9,6 +9,7 @@ import {
   Flex,
   Group,
   Modal,
+  Skeleton,
   Space,
   Text,
   TextInput,
@@ -18,26 +19,27 @@ import {
   useMantineColorScheme,
 } from '@mantine/core';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { runInAction } from 'mobx';
 import { notifications } from '@mantine/notifications';
 import { useDisclosure } from '@mantine/hooks';
 import { IconCross, IconSettings, IconUpload, IconX } from '@tabler/icons-react';
 import { useRootStore } from '@/stores/Root.store';
-import PizzaComponent from '@/components/PizzaComponent';
-import GroupMembers from '@/components/GroupMembers';
+import PizzaComponent from '@/components/Group/PizzaComponent';
+import GroupMembers from '@/components/Group/GroupMembers';
 import { getDayDifference } from '@/utils/date';
-import GroupTimeline from '@/components/GroupTimeline';
+import GroupTimeline from '@/components/Group/GroupTimeline';
 
 const GroupPage: React.FC = observer(() => {
   const store = useRootStore();
-  const { id } = useParams();
-  const indexStoredGroup = store.groupById(Number(id));
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { colorScheme } = useMantineColorScheme();
+
   const [openedModal, setModal] = useDisclosure(false);
   const [openDescription, { open, close }] = useDisclosure(false);
   const [username, setUsername] = React.useState('');
-  const { colorScheme } = useMantineColorScheme();
-  const location = useLocation();
-  const navigate = useNavigate();
+
+  const { id } = useParams();
+  const group = store.groupStore.getGroupById(Number(id));
 
   const imageBackground = () => {
     if (colorScheme === 'light') {
@@ -48,21 +50,20 @@ const GroupPage: React.FC = observer(() => {
 
   async function fetchData() {
     const updatedGroup = await store.api.fetchGroup(Number(id));
-
-    runInAction(() => {
-      store.groups[indexStoredGroup] = updatedGroup;
-    });
+    store.groupStore.updateGroups([updatedGroup]);
   }
   useEffect(() => {
     fetchData();
-  }, [store.api]);
+  }, []);
 
   const handleAddUser = async () => {
     try {
-      await store.api.addUser({
-        groupId: Number(id),
-        username,
-      });
+      store.groupStore.updateGroups([
+        await store.api.addUser({
+          groupId: Number(id),
+          username,
+        }),
+      ]);
     } catch (e) {
       if ((e as Response).status === 404) {
         notifications.show({
@@ -78,22 +79,13 @@ const GroupPage: React.FC = observer(() => {
           icon: <IconX />,
           color: 'red',
         });
-      } else {
-        notifications.show({
-          title: `Erreur ${(e as Response).status}`,
-          message: (e as Response).statusText,
-          icon: <IconX />,
-          color: 'red',
-        });
       }
+      throw e;
     }
-
-    await fetchData();
   };
 
   const handleAssociateGroup = async () => {
     try {
-      console.log('id', id);
       await store.api.associateGroup(Number(id));
       await fetchData();
     } catch (e) {
@@ -105,32 +97,7 @@ const GroupPage: React.FC = observer(() => {
     }
   };
 
-  const handleRemoveUser = async (usernameToRemove: string) => {
-    try {
-      await store.api.removeUser({
-        groupId: Number(id),
-        username: usernameToRemove,
-      });
-      await fetchData();
-    } catch (e) {
-      notifications.show({
-        title: `Erreur ${(e as Response).status}`,
-        message: (e as Response).statusText,
-        icon: <IconCross />,
-      });
-    }
-  };
-
-  const handleUpdateMember = async (role: string, usernameToUpdate: string, groupId: number) => {
-    await store.api.changeRole({
-      groupId,
-      username: usernameToUpdate,
-      role,
-    });
-    await fetchData();
-  };
-
-  return store.groups[indexStoredGroup] !== undefined ? (
+  return group ? (
     <>
       <Box py="md">
         <BackgroundImage
@@ -163,24 +130,20 @@ const GroupPage: React.FC = observer(() => {
 
       <Group>
         <Title order={1} lineClamp={1}>
-          {store.groups[indexStoredGroup]?.name}
+          {group?.name}
         </Title>
         <Badge size="lg" variant="light">
-          <Tooltip label={new Date(store.groups[indexStoredGroup]?.dueDate).toDateString()}>
-            <Text>
-              {getDayDifference(new Date(), new Date(store.groups[indexStoredGroup]?.dueDate))}
-            </Text>
+          <Tooltip label={new Date(group?.dueDate!).toDateString()}>
+            <Text>{getDayDifference(new Date(), new Date(group?.dueDate!))}</Text>
           </Tooltip>
         </Badge>
       </Group>
       <UnstyledButton onClick={openDescription ? close : open}>
-        <Text lineClamp={openDescription ? 10 : 2}>
-          {store.groups[indexStoredGroup]?.description}
-        </Text>
+        <Text lineClamp={openDescription ? 10 : 2}>{group?.description}</Text>
       </UnstyledButton>
 
       <Group>
-        {store.groups[indexStoredGroup].status === 'OPEN' ? (
+        {group.status === 'OPEN' ? (
           <Button onClick={() => handleAssociateGroup()}>Associate pizzas</Button>
         ) : (
           <Button leftSection={<IconX />}>Close Group</Button>
@@ -194,25 +157,20 @@ const GroupPage: React.FC = observer(() => {
         </Button>
       </Group>
 
-      {store.groups[indexStoredGroup].status === 'ASSOCIATED' ? (
+      {group.status === 'ASSOCIATED' ? (
         <>
-          <PizzaComponent indexStoredGroup={indexStoredGroup} />
+          <PizzaComponent group={group} />
           <Divider my="lg" />
         </>
-      ) : store.groups[indexStoredGroup].status === 'CLOSED' ? (
+      ) : group.status === 'CLOSED' ? (
         <Text>Group is closed</Text>
       ) : (
         <></>
       )}
 
-      <GroupTimeline group={store.groups[indexStoredGroup]} />
+      <GroupTimeline group={group} />
 
-      <GroupMembers
-        handleUpdateMember={handleUpdateMember}
-        handleRemoveUser={handleRemoveUser}
-        indexStoredGroup={indexStoredGroup}
-        open={setModal.open}
-      />
+      <GroupMembers open={setModal.open} />
 
       <Modal opened={openedModal} onClose={setModal.close} title="Add a new member">
         <TextInput
@@ -234,7 +192,7 @@ const GroupPage: React.FC = observer(() => {
       </Modal>
     </>
   ) : (
-    <Text>Is loading</Text>
+    <Skeleton />
   );
 });
 

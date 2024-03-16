@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import { Button, Center, Group, Text, Textarea, TextInput, Title } from '@mantine/core';
 import { useNavigate, useParams } from 'react-router-dom';
-import { runInAction } from 'mobx';
 import { useForm } from '@mantine/form';
 import { DatePickerInput } from '@mantine/dates';
 import { useRootStore } from '@/stores/Root.store';
@@ -10,9 +9,10 @@ import { GROUP } from '@/routes';
 
 const ModifyGroupPage: React.FC = observer(() => {
   const store = useRootStore();
-  const { id } = useParams();
-  const indexStoredGroup = store.groupById(Number(id));
   const navigate = useNavigate();
+
+  const { id } = useParams();
+  const group = store.groupStore.getGroupById(Number(id));
 
   const formName = useForm({
     initialValues: {
@@ -50,11 +50,18 @@ const ModifyGroupPage: React.FC = observer(() => {
 
   async function fetchData() {
     const updatedGroup = await store.api.fetchGroup(Number(id));
-
-    runInAction(() => {
-      store.groups[indexStoredGroup] = updatedGroup;
-    });
+    store.groupStore.updateGroups([updatedGroup]);
+    if (group?.name) {
+      formName.setFieldValue('name', group?.name);
+    }
+    if (group?.description) {
+      formDescription.setFieldValue('description', group?.description);
+    }
+    if (group?.dueDate) {
+      formDueDate.setFieldValue('dueDate', new Date(group?.dueDate));
+    }
   }
+
   useEffect(() => {
     fetchData();
   }, [store.api]);
@@ -80,15 +87,20 @@ const ModifyGroupPage: React.FC = observer(() => {
       dueDate: formDueDate.values.dueDate.toISOString(),
     };
 
-    await store.api.updateGroupDate(Number(id), dueDate);
+    return store.api.updateGroupDate(Number(id), dueDate);
   };
 
-  const handleUpdate = () => {
-    handleUpdateGroupName().then(handleUpdateGroupDescription).then(handleUpdateGroupDueDate);
+  const handleUpdate = async () => {
+    await handleUpdateGroupName();
+    await handleUpdateGroupDescription();
+
+    const updatedGroup = await handleUpdateGroupDueDate();
+    store.groupStore.updateGroups([updatedGroup]);
+
     navigate(`${GROUP}/${id}`);
   };
 
-  return store.groups[indexStoredGroup] !== undefined ? (
+  return group !== undefined ? (
     <>
       <Title py="md" order={1}>
         Modify group

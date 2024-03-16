@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import classes from './Header.module.css';
 import { DASHBOARD, SIGNIN, SIGNUP } from '@/routes';
-import { ProfileMenu } from '@/components/ProfileMenu';
+import { ProfileMenu } from '@/components/Shell/ProfileMenu';
 import { useRootStore } from '@/stores/Root.store';
 import { ColorSchemeToggle } from '@/components/ColorSchemeToggle/ColorSchemeToggle';
 
@@ -15,11 +15,11 @@ export const Header = observer(() => {
   const navigate = useNavigate();
   const store = useRootStore();
 
+  const currentUser = store.userStore.getCurrentUser();
+
   useEffect(() => {
     async function loadCurrentUser() {
-      if (store.currentUser === undefined) {
-        await store.loadCurrentUser();
-      }
+      await store.loadCurrentUser();
     }
     loadCurrentUser();
   }, [store.api]);
@@ -49,7 +49,7 @@ export const Header = observer(() => {
 
           <Group>
             <ColorSchemeToggle />
-            {!store.currentUser ? (
+            {!currentUser ? (
               <Group visibleFrom="sm">
                 <Button variant="default" onClick={() => navigate(SIGNIN)}>
                   Log in
