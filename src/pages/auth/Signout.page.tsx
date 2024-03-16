@@ -4,6 +4,7 @@ import { LoadingOverlay } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { SIGNIN } from '@/routes';
 import { useRootStore } from '@/stores/Root.store';
+import { showSuccessNotification } from '@/utils/notification';
 
 const Signout: React.FC = observer(() => {
   const navigate = useNavigate();
@@ -11,11 +12,12 @@ const Signout: React.FC = observer(() => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    const timer = setTimeout(async () => {
       setIsLoading(false);
       localStorage.removeItem('accessToken');
       store.reset();
       navigate(SIGNIN);
+      await showSuccessNotification('Signed out successfully');
     }, 2000);
 
     return () => clearTimeout(timer);

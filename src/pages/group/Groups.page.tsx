@@ -6,6 +6,7 @@ import { IconPlus } from '@tabler/icons-react';
 import { useRootStore } from '@/stores/Root.store';
 import { GROUP } from '@/routes';
 import GroupCard from '@/components/Group/GroupCard';
+import { showErrorNotification } from '@/utils/notification';
 
 const GroupsPage: React.FC = observer(() => {
   const store = useRootStore();
@@ -15,8 +16,12 @@ const GroupsPage: React.FC = observer(() => {
 
   useEffect(() => {
     async function fetchData() {
-      const updatedGroups = await store.api.fetchGroups();
-      store.groupStore.updateGroups(updatedGroups);
+      try {
+        const updatedGroups = await store.api.fetchGroups();
+        store.groupStore.updateGroups(updatedGroups);
+      } catch (e) {
+        await showErrorNotification(e, 'Failed to fetch groups');
+      }
     }
     fetchData();
   }, [store.api]);

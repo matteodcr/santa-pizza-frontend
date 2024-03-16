@@ -17,6 +17,7 @@ import { useRootStore } from '@/stores/Root.store';
 import AvatarBadge from '@/components/AvatarBadge';
 import { GROUP } from '@/routes';
 import { Group } from '@/stores/entity/Group';
+import { showErrorNotification, showSuccessNotification } from '@/utils/notification';
 
 interface GroupCardProps {
   group: Group;
@@ -27,9 +28,14 @@ const GroupCard = observer(({ group }: GroupCardProps) => {
   const store = useRootStore();
 
   const handleDelete = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, id: number) => {
-    e.stopPropagation();
-    await store.api.deleteGroup(id);
-    store.groupStore.deleteGroup(id);
+    try {
+      e.stopPropagation();
+      await store.api.deleteGroup(id);
+      store.groupStore.deleteGroup(id);
+      await showSuccessNotification('Group deleted successfully');
+    } catch (e) {
+      await showErrorNotification(e, 'Failed to delete group');
+    }
   };
   return (
     <Card
@@ -58,7 +64,7 @@ const GroupCard = observer(({ group }: GroupCardProps) => {
       <GroupUI justify="space-between">
         <Avatar.Group>
           {group.memberships.map((membership) => (
-            <AvatarBadge key={membership.id} user={membership.user} />
+            <AvatarBadge key={membership.id} user={membership.user!} />
           ))}
         </Avatar.Group>
         <Menu shadow="md" width={200}>
@@ -82,7 +88,7 @@ const GroupCard = observer(({ group }: GroupCardProps) => {
           <Menu.Dropdown>
             <Menu.Item
               color="red"
-              onClick={(e) => handleDelete(e, group.id)}
+              onClick={(e) => handleDelete(e, group.id!)}
               leftSection={
                 <IconTrash
                   style={{

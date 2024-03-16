@@ -21,12 +21,13 @@ import {
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { notifications } from '@mantine/notifications';
 import { useDisclosure } from '@mantine/hooks';
-import { IconCross, IconSettings, IconUpload, IconX } from '@tabler/icons-react';
+import { IconSettings, IconUpload, IconX } from '@tabler/icons-react';
 import { useRootStore } from '@/stores/Root.store';
 import PizzaComponent from '@/components/Group/PizzaComponent';
 import GroupMembers from '@/components/Group/GroupMembers';
 import { getDayDifference } from '@/utils/date';
 import GroupTimeline from '@/components/Group/GroupTimeline';
+import { showErrorNotification, showSuccessNotification } from '@/utils/notification';
 
 const GroupPage: React.FC = observer(() => {
   const store = useRootStore();
@@ -49,9 +50,14 @@ const GroupPage: React.FC = observer(() => {
   };
 
   async function fetchData() {
-    const updatedGroup = await store.api.fetchGroup(Number(id));
-    store.groupStore.updateGroups([updatedGroup]);
+    try {
+      const updatedGroup = await store.api.fetchGroup(Number(id));
+      store.groupStore.updateGroups([updatedGroup]);
+    } catch (e) {
+      await showErrorNotification(e, 'Failed to fetch group');
+    }
   }
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -88,12 +94,9 @@ const GroupPage: React.FC = observer(() => {
     try {
       await store.api.associateGroup(Number(id));
       await fetchData();
+      await showSuccessNotification('Group associated successfully');
     } catch (e) {
-      notifications.show({
-        title: `Erreur ${(e as Response).status}`,
-        message: (e as Response).statusText,
-        icon: <IconCross />,
-      });
+      await showErrorNotification(e, 'Failed to associate group');
     }
   };
 

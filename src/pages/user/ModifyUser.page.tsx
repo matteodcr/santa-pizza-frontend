@@ -20,6 +20,7 @@ import { UpdateUserData } from '@/stores/Api.store';
 import 'react-advanced-cropper/dist/style.css';
 import CropProfilePicture from '@/components/User/CropProfilePicture';
 import getInitials from '@/utils/initials';
+import { showErrorNotification, showSuccessNotification } from '@/utils/notification';
 
 const ModifyUserPage: React.FC = observer(() => {
   const store = useRootStore();
@@ -36,15 +37,19 @@ const ModifyUserPage: React.FC = observer(() => {
   });
 
   async function fetchData() {
-    await store.loadCurrentUser();
-    if (user?.name) {
-      form.setFieldValue('name', user?.name);
-    }
-    if (user?.description) {
-      form.setFieldValue('description', user?.description);
-    }
-    if (user?.allergies) {
-      setAllergies(user?.allergies);
+    try {
+      await store.loadCurrentUser();
+      if (user?.name) {
+        form.setFieldValue('name', user?.name);
+      }
+      if (user?.description) {
+        form.setFieldValue('description', user?.description);
+      }
+      if (user?.allergies) {
+        setAllergies(user?.allergies);
+      }
+    } catch (e) {
+      await showErrorNotification(e, 'Failed to fetch user');
     }
   }
   useEffect(() => {
@@ -52,13 +57,18 @@ const ModifyUserPage: React.FC = observer(() => {
   }, [store]);
 
   const handleUpdate = async () => {
-    const updateUserData: UpdateUserData = {
-      ...form.values,
-      allergies,
-    };
-    await store.api.updateUser(updateUserData);
+    try {
+      const updateUserData: UpdateUserData = {
+        ...form.values,
+        allergies,
+      };
+      await store.api.updateUser(updateUserData);
 
-    navigate(`${USER}/${user?.username}`);
+      navigate(`${USER}/${user?.username}`);
+      await showSuccessNotification('User updated successfully');
+    } catch (e) {
+      await showErrorNotification(e, 'Failed to update user');
+    }
   };
 
   return (

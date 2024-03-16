@@ -67,7 +67,7 @@ export function Router() {
             <Route path={`${USER}/:username`} element={<UserPage />} />
             <Route path={`${USER}/me/modify`} element={<ModifyUserPage />} />
           </Routes>
-          <Notifications position="bottom-right" />
+          <Notifications position="bottom-right" pb="3%" />
         </AppShell.Main>
         <AppShell.Footer>
           <Footer />

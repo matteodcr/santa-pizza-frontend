@@ -6,6 +6,7 @@ import { IconInfoCircle, IconPencil } from '@tabler/icons-react';
 import { useRootStore } from '@/stores/Root.store';
 import { USER } from '@/routes';
 import getInitials from '@/utils/initials';
+import { showErrorNotification } from '@/utils/notification';
 
 const UserPage: React.FC = observer(() => {
   const store = useRootStore();
@@ -18,8 +19,9 @@ const UserPage: React.FC = observer(() => {
       try {
         await store.loadUser(username!);
       } catch (e) {
+        await showErrorNotification(e, 'Failed to fetch user');
         if ((e as Response).status === 404) {
-          navigate(`${USER}/404`, { replace: true });
+          navigate('/404', { replace: true });
         }
       }
     }

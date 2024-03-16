@@ -6,6 +6,7 @@ import { useForm } from '@mantine/form';
 import classes from './Auth.module.css';
 import { useRootStore } from '@/stores/Root.store';
 import { SIGNIN } from '@/routes';
+import { showSuccessNotification } from '@/utils/notification';
 
 const Signup: React.FC = observer(() => {
   const store = useRootStore();
@@ -43,9 +44,9 @@ const Signup: React.FC = observer(() => {
     try {
       await store.api.signup(form.values);
       navigate(SIGNIN);
-      // Handle success
+      await showSuccessNotification('Signed up successfully');
     } catch (error) {
-      // Handle error
+      await showSuccessNotification('Failed to sign up');
     }
   };
 

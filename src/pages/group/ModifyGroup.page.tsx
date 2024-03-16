@@ -6,6 +6,7 @@ import { useForm } from '@mantine/form';
 import { DatePickerInput } from '@mantine/dates';
 import { useRootStore } from '@/stores/Root.store';
 import { GROUP } from '@/routes';
+import { showErrorNotification, showSuccessNotification } from '@/utils/notification';
 
 const ModifyGroupPage: React.FC = observer(() => {
   const store = useRootStore();
@@ -75,11 +76,13 @@ const ModifyGroupPage: React.FC = observer(() => {
   };
 
   const handleUpdateGroupDescription = async () => {
-    const description = {
-      ...formDescription.values,
-    };
+    try {
+      const description = {
+        ...formDescription.values,
+      };
 
-    await store.api.updateGroupDescription(Number(id), description);
+      await store.api.updateGroupDescription(Number(id), description);
+    } catch (e) {}
   };
 
   const handleUpdateGroupDueDate = async () => {
@@ -91,13 +94,18 @@ const ModifyGroupPage: React.FC = observer(() => {
   };
 
   const handleUpdate = async () => {
-    await handleUpdateGroupName();
-    await handleUpdateGroupDescription();
+    try {
+      await handleUpdateGroupName();
+      await handleUpdateGroupDescription();
 
-    const updatedGroup = await handleUpdateGroupDueDate();
-    store.groupStore.updateGroups([updatedGroup]);
+      const updatedGroup = await handleUpdateGroupDueDate();
+      store.groupStore.updateGroups([updatedGroup]);
 
-    navigate(`${GROUP}/${id}`);
+      navigate(`${GROUP}/${id}`);
+      await showSuccessNotification('Group updated successfully');
+    } catch (e) {
+      await showErrorNotification(e, 'Failed to update group');
+    }
   };
 
   return group !== undefined ? (
