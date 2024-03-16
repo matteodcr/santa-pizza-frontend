@@ -50,6 +50,19 @@ export class RootStore {
     makeAutoObservable(this);
   }
 
+  get avatarUrl(): string {
+    const url = this.currentUser?.avatarUrl;
+
+    if (url?.startsWith('blob')) {
+      return url;
+    }
+    return `${this.api.base_url}/${url}`;
+  }
+
+  setCurrentAvatar(blob: Blob) {
+    this.currentUser!.avatarUrl = URL.createObjectURL(blob);
+  }
+
   public reset(): void {
     this.groups = [];
     this.users = [];

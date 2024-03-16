@@ -5,6 +5,7 @@ import {
   Button,
   Center,
   Group,
+  Skeleton,
   Stack,
   TagsInput,
   Textarea,
@@ -65,9 +66,14 @@ const ModifyUserPage: React.FC = observer(() => {
           Edit user profile
         </Title>
         <Stack align="center">
-          <Avatar size={200} src={`${store.api.base_url}/${store.currentUser?.avatarUrl}`}>
-            {getInitials(store.currentUser?.name)}
-          </Avatar>
+          {store.currentUser ? (
+            <Avatar size={200} src={store.avatarUrl}>
+              {getInitials(store.currentUser?.name)}
+            </Avatar>
+          ) : (
+            <Skeleton height={200} circle mb="xl" />
+          )}
+
           <CropProfilePicture />
         </Stack>
         <TextInput
@@ -85,7 +91,7 @@ const ModifyUserPage: React.FC = observer(() => {
           maxRows={4}
           {...form.getInputProps('description')}
         />
-        <TagsInput data={[]} value={allergies} onChange={setAllergies} />
+        <TagsInput py="md" data={[]} value={allergies} onChange={setAllergies} />
         <Center>
           <Group>
             <Button px="md" onClick={handleUpdate} mt="md">

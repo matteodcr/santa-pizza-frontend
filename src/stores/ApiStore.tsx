@@ -124,6 +124,7 @@ export default class Api {
       },
       body: JSON.stringify(createGroupData),
     };
+    console.log('test');
     return this.fetch(`${this.group_url}`, requestOptions);
   }
 
@@ -227,6 +228,14 @@ export default class Api {
     return this.fetch(`${this.user_url}/modify`, requestOptions);
   }
 
+  async updateAvatar(formData: FormData, init?: RequestInit | undefined): Promise<void> {
+    const requestOptions: RequestInit = {
+      method: 'POST',
+      body: formData,
+    };
+    return this.fetch(`${this.user_url}/upload`, requestOptions);
+  }
+
   async changeRole(updateUserData: ChangeRoleData, init?: RequestInit | undefined): Promise<Group> {
     const requestOptions: RequestInit = {
       method: 'PATCH',
@@ -239,10 +248,13 @@ export default class Api {
   }
 
   private async fetch(input: RequestInfo, init?: RequestInit | undefined): Promise<any | null> {
-    const headers = {
+    const headers: Record<string, any> = {
       Authorization: `Bearer ${localStorage.getItem('accessToken')}` || '',
-      'Content-Type': 'application/json',
     };
+
+    if (!(init?.body instanceof FormData)) {
+      headers['Content-Type'] = 'application/json';
+    }
 
     const mergedInit = {
       ...init,

@@ -29,7 +29,7 @@ const UserPage: React.FC = observer(() => {
   return user ? (
     <Paper radius="md" withBorder p="lg" bg="var(--mantine-color-body)">
       <Center>
-        <Avatar size={200} src={`${store.api.base_url}/${user?.avatarUrl}`}>
+        <Avatar size={200} src={store.avatarUrl}>
           {getInitials(user.name)}
         </Avatar>
       </Center>

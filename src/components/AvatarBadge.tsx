@@ -54,7 +54,7 @@ export default function AvatarBadge({ user, avatarSize, admin }: AvatarBadgeProp
           >
             <Avatar
               size={avatarSize || 'lg'}
-              src={`${store.api.base_url}/${user?.avatarUrl}`}
+              src={user?.avatarUrl}
               style={admin ? { border: `2px solid ${theme.colors.orange[4]}` } : {}}
             >
               {getInitials(user.name)}

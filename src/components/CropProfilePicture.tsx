@@ -2,8 +2,13 @@ import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { CircleStencil, Cropper, CropperRef, ImageRestriction } from 'react-advanced-cropper';
 import { Button } from '@mantine/core';
 import { modals } from '@mantine/modals';
+import { observer } from 'mobx-react';
+import { notifications } from '@mantine/notifications';
+import { IconX } from '@tabler/icons-react';
+import { useRootStore } from '@/stores/Root.store';
 
-export const CropProfilePicture = () => {
+export const CropProfilePicture = observer(() => {
+  const store = useRootStore();
   const [image, setImage] = useState<string>(
     'https://images.unsplash.com/photo-1710432157519-e437027d2e8f?q=80&w=3759&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
   );
@@ -12,17 +17,37 @@ export const CropProfilePicture = () => {
   const cropperRef = useRef<CropperRef>(null);
   const [userHasUploaded, setUserHasUploaded] = useState(false);
 
-  const onCrop = () => {
-    console.log(image);
+  const onCrop = async () => {
     const cropper = cropperRef.current;
     if (cropper) {
       const canvas = cropper.getCanvas();
-      const newTab = window.open();
-      if (newTab && canvas) {
-        newTab.document.body.innerHTML = `<img src="${canvas.toDataURL()}"></img>`;
+      if (canvas) {
+        canvas.toBlob(
+          async (blob) => {
+            if (blob) {
+              console.log("Taille de l'image:", blob.size, 'octets');
+              const formData = new FormData();
+              formData.append('file', blob, 'image.jpg');
+              try {
+                await store.api.updateAvatar(formData);
+                store.setCurrentAvatar(blob);
+              } catch (error) {
+                notifications.show({
+                  title: 'Error',
+                  message: 'An error occurred while updating your avatar',
+                  color: 'red',
+                  icon: <IconX />,
+                });
+              }
+            }
+          },
+          'image/jpeg',
+          0.95
+        );
       }
     }
   };
+
   const openModal = () =>
     modals.openConfirmModal({
       title: 'Please confirm your action',
@@ -88,6 +113,6 @@ export const CropProfilePicture = () => {
       </div>
     </div>
   );
-};
+});
 
 export default CropProfilePicture;

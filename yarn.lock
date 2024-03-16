@@ -5364,6 +5364,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"advanced-cropper@npm:~0.18.0":
+  version: 0.18.0
+  resolution: "advanced-cropper@npm:0.18.0"
+  dependencies:
+    tslib: "npm:^2.4.0"
+  checksum: a162e2f2741649bd75640dec0703996ffdf7de35390e5c14e6b0a1c3875dccc314552e576193370486d12533d42a12be894f05b1cfb6bd0e5364d7bfff21a2dd
+  languageName: node
+  linkType: hard
+
 "agent-base@npm:5":
   version: 5.1.1
   resolution: "agent-base@npm:5.1.1"
@@ -6155,6 +6164,13 @@ __metadata:
   version: 3.9.0
   resolution: "ci-info@npm:3.9.0"
   checksum: 6f0109e36e111684291d46123d491bc4e7b7a1934c3a20dea28cba89f1d4a03acd892f5f6a81ed3855c38647e285a150e3c9ba062e38943bef57fee6c1554c3a
+  languageName: node
+  linkType: hard
+
+"classnames@npm:^2.2.6":
+  version: 2.5.1
+  resolution: "classnames@npm:2.5.1"
+  checksum: afff4f77e62cea2d79c39962980bf316bacb0d7c49e13a21adaadb9221e1c6b9d3cdb829d8bb1b23c406f4e740507f37e1dcf506f7e3b7113d17c5bab787aa69
   languageName: node
   linkType: hard
 
@@ -9826,6 +9842,7 @@ __metadata:
     prettier: "npm:^3.1.1"
     prop-types: "npm:^15.8.1"
     react: "npm:^18.2.0"
+    react-advanced-cropper: "npm:^0.19.6"
     react-dom: "npm:^18.2.0"
     react-router-dom: "npm:^6.22.2"
     recharts: "npm:2"
@@ -11219,6 +11236,19 @@ __metadata:
     iconv-lite: "npm:0.4.24"
     unpipe: "npm:1.0.0"
   checksum: 5dad5a3a64a023b894ad7ab4e5c7c1ce34d3497fc7138d02f8c88a3781e68d8a55aa7d4fd3a458616fa8647cc228be314a1c03fb430a07521de78b32c4dd09d2
+  languageName: node
+  linkType: hard
+
+"react-advanced-cropper@npm:^0.19.6":
+  version: 0.19.6
+  resolution: "react-advanced-cropper@npm:0.19.6"
+  dependencies:
+    advanced-cropper: "npm:~0.18.0"
+    classnames: "npm:^2.2.6"
+    tslib: "npm:^2.4.0"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0
+  checksum: 3894d30d334fa7c692a28d457bddb63359c54eaf41788d16a6d279318fee941eb3dc07380b9908a5455496b1cc636718e9de30936ae1ab97c8a9c9155436220d
   languageName: node
   linkType: hard
 
