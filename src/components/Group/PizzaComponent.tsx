@@ -4,7 +4,6 @@ import { observer } from 'mobx-react';
 import { useRootStore } from '@/stores/Root.store';
 import AvatarBadge from '@/components/AvatarBadge';
 import { Group } from '@/stores/entity/Group';
-import { Membership } from '@/stores/entity/Membership';
 
 interface PizzaComponentProps {
   group: Group;
@@ -19,11 +18,7 @@ const PizzaComponent: React.FC<PizzaComponentProps> = observer(({ group }: Pizza
   };
 
   const currentUser = store.userStore.getCurrentUser();
-
-  let santaMembership: Membership | undefined;
-  if (currentUser) {
-    santaMembership = store.groupStore.getUserMembership(group, currentUser);
-  }
+  const santaMembership = store.groupStore.getUserMembership(group, currentUser!);
 
   return (
     <>
@@ -60,7 +55,7 @@ const PizzaComponent: React.FC<PizzaComponentProps> = observer(({ group }: Pizza
               <Title order={5}>Receiver</Title>
             </Flex>
           ) : (
-            <Text>No Santa</Text>
+            <Text>No receiver</Text>
           )}
         </GroupUI>
       ) : (
