@@ -1,23 +1,53 @@
 import {
-  ActionIcon,
   Avatar,
+  BackgroundImage,
   Badge,
+  Box,
   Card,
+  Flex,
   Group as GroupUI,
-  Image,
-  Menu,
-  rem,
   Title,
+  useMantineTheme,
 } from '@mantine/core';
 import { observer } from 'mobx-react';
 import React from 'react';
-import { IconDots, IconTrash } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 import { useRootStore } from '@/stores/Root.store';
 import AvatarBadge from '@/components/AvatarBadge';
 import { GROUP } from '@/routes';
 import { Group } from '@/stores/entity/Group';
-import { showErrorNotification, showSuccessNotification } from '@/utils/notification';
+import styles from './GroupCard.module.css';
+
+export const GroupBadge = observer(({ status }: { status: string }) => {
+  const theme = useMantineTheme();
+  const groupStatus = (status: string) => {
+    if (status === 'OPEN') {
+      return theme.colors.green[6];
+    }
+    if (status === 'ASSOCIATED') {
+      return theme.colors.pink[6];
+    }
+    return 'gray';
+  };
+  const store = useRootStore();
+  return (
+    <Flex
+      mih={50}
+      gap="md"
+      justify="flex-end"
+      align="flex-end"
+      direction="column"
+      wrap="wrap"
+      h="100%"
+    >
+      <Box p="1em" style={{ borderRadius: '10px' }}>
+        <Badge size="lg" color={groupStatus(status)}>
+          {status}
+        </Badge>
+      </Box>
+    </Flex>
+  );
+});
 
 interface GroupCardProps {
   group: Group;
@@ -25,84 +55,44 @@ interface GroupCardProps {
 
 const GroupCard = observer(({ group }: GroupCardProps) => {
   const navigate = useNavigate();
-  const store = useRootStore();
 
-  const handleDelete = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, id: number) => {
-    try {
-      e.stopPropagation();
-      await store.api.deleteGroup(id);
-      store.groupStore.deleteGroup(id);
-      await showSuccessNotification('Group deleted successfully');
-    } catch (e) {
-      await showErrorNotification(e, 'Failed to delete group');
-    }
-  };
   return (
     <Card
       onClick={() => navigate(`${GROUP}/${group.id}`)}
       shadow="sm"
       padding="lg"
-      radius="md"
+      radius="lg"
       style={{ cursor: 'pointer' }}
       withBorder
+      className={styles.card}
     >
       <Card.Section>
-        <Image
-          src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png"
-          height={160}
-          alt="Norway"
-        />
+        {group.backgroundUrl ? (
+          <BackgroundImage src={group.backgroundUrl!} h={200}>
+            <GroupBadge status={group.status!} />
+          </BackgroundImage>
+        ) : (
+          <Box h={200} p={0} bg="var(--mantine-color-blue-light)">
+            <GroupBadge status={group.status!} />
+          </Box>
+        )}
+
+        <Box p="md" pt={0}>
+          <GroupUI justify="space-between" pt="xs" mb="xs">
+            <Title lineClamp={1} order={3} fw={500}>
+              {group.name}
+            </Title>
+          </GroupUI>
+
+          <GroupUI justify="space-between">
+            <Avatar.Group>
+              {group.memberships.map((membership) => (
+                <AvatarBadge key={membership.id} user={membership.user!} />
+              ))}
+            </Avatar.Group>
+          </GroupUI>
+        </Box>
       </Card.Section>
-
-      <GroupUI justify="space-between" mt="md" mb="xs">
-        <Title lineClamp={1} order={3} fw={500}>
-          {group.name}
-        </Title>
-        <Badge color="pink">{group.status}</Badge>
-      </GroupUI>
-
-      <GroupUI justify="space-between">
-        <Avatar.Group>
-          {group.memberships.map((membership) => (
-            <AvatarBadge key={membership.id} user={membership.user!} />
-          ))}
-        </Avatar.Group>
-        <Menu shadow="md" width={200}>
-          <Menu.Target>
-            <ActionIcon
-              onClick={(e) => e.stopPropagation()}
-              variant="default"
-              size="lg"
-              aria-label="Settings"
-            >
-              <IconDots
-                style={{
-                  width: '70%',
-                  height: '70%',
-                }}
-                stroke={1.5}
-              />
-            </ActionIcon>
-          </Menu.Target>
-
-          <Menu.Dropdown>
-            <Menu.Item
-              color="red"
-              onClick={(e) => handleDelete(e, group.id!)}
-              leftSection={
-                <IconTrash
-                  style={{
-                    width: rem(14),
-                    height: rem(14),
-                  }}
-                />
-              }
-            >
-              Delete group
-            </Menu.Item>
-          </Menu.Dropdown>
-        </Menu>
-      </GroupUI>
     </Card>
   );
 });

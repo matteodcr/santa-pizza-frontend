@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from '@mantine/form';
 import classes from './Auth.module.css';
 import { useRootStore } from '@/stores/Root.store';
-import { DASHBOARD } from '@/routes';
+import { GROUPS } from '@/routes';
 import { showErrorNotification, showSuccessNotification } from '@/utils/notification';
 
 const Signin: React.FC = observer(() => {
@@ -50,7 +50,7 @@ const Signin: React.FC = observer(() => {
       console.log('token:', localStorage.getItem('accessToken'));
       await store.loadCurrentUser();
       await showSuccessNotification('Signed in successfully');
-      navigate(DASHBOARD);
+      navigate(GROUPS);
     } catch (e) {
       await showErrorNotification(e, 'Failed to sign in');
     }

@@ -1,8 +1,19 @@
 import React, { useEffect } from 'react';
 import { observer } from 'mobx-react';
-import { Alert, Avatar, Button, Center, Group, Paper, Text } from '@mantine/core';
+import {
+  Alert,
+  Avatar,
+  Button,
+  Center,
+  Group,
+  List,
+  Paper,
+  rem,
+  Text,
+  ThemeIcon,
+} from '@mantine/core';
 import { useNavigate, useParams } from 'react-router-dom';
-import { IconInfoCircle, IconPencil } from '@tabler/icons-react';
+import { IconInfoCircle, IconPencil, IconX } from '@tabler/icons-react';
 import { useRootStore } from '@/stores/Root.store';
 import { USER } from '@/routes';
 import getInitials from '@/utils/initials';
@@ -44,7 +55,22 @@ const UserPage: React.FC = observer(() => {
       <h3>Description</h3>
       {user.description}
       <h3>Allergies</h3>
-      <ul>{user.allergies?.map((allergy, index) => <li key={index}>{allergy}</li>)}</ul>
+      <List
+        icon={
+          <ThemeIcon color="red" size={15} radius="xl">
+            <IconX style={{ width: rem(16), height: rem(16) }} />
+          </ThemeIcon>
+        }
+        spacing="xs"
+        size="sm"
+        center
+      >
+        {user.allergies?.map((allergy, index) => (
+          <List.Item key={index}>
+            <Text size="sm">{allergy}</Text>
+          </List.Item>
+        ))}
+      </List>
       {user.username === store.userStore.getCurrentUser()?.username && (
         <Group mt="lg" justify="center">
           <Button leftSection={<IconPencil />} onClick={() => navigate(`${USER}/me/modify`)}>

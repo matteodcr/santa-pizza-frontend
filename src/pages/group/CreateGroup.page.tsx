@@ -6,7 +6,7 @@ import { useForm } from '@mantine/form';
 import { DatePickerInput } from '@mantine/dates';
 import { useRootStore } from '@/stores/Root.store';
 import { CreateGroupData } from '@/stores/Api.store';
-import { DASHBOARD } from '@/routes';
+import { GROUPS } from '@/routes';
 import { showErrorNotification, showSuccessNotification } from '@/utils/notification';
 
 const CreateGroupPage: React.FC = observer(() => {
@@ -42,7 +42,7 @@ const CreateGroupPage: React.FC = observer(() => {
         dueDate: form.values.dueDate.toISOString(),
       };
       await store.api.createGroup(createGroupData);
-      navigate(DASHBOARD);
+      navigate(GROUPS);
       await showSuccessNotification('Group created successfully');
     } catch (e) {
       await showErrorNotification(e, 'Failed to create group');

@@ -1,0 +1,15 @@
+.card {
+    @mixin hover {
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        &:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            opacity: 0.9;
+            background-color: #f0f0f0;
+
+            @media (prefers-color-scheme: dark) {
+                background-color: #212121;
+            }
+        }
+    }
+}

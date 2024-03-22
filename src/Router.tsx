@@ -4,7 +4,7 @@ import { useMediaQuery } from '@mantine/hooks';
 import { AppShell, em } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { HomePage } from './pages/Home.page';
-import { DASHBOARD, GROUP, SIGNIN, SIGNOUT, SIGNUP, USER } from '@/routes';
+import { GROUP, GROUPS, SIGNIN, SIGNOUT, SIGNUP, USER } from '@/routes';
 import { useRootStore } from '@/stores/Root.store';
 import UserPage from '@/pages/user/User.page';
 import GroupPage from '@/pages/group/Group.page';
@@ -60,7 +60,7 @@ export function Router() {
             <Route path={SIGNIN} element={<Signin />} />
             <Route path={SIGNUP} element={<Signup />} />
             <Route path={SIGNOUT} element={<Signout />} />
-            <Route path={DASHBOARD} element={<GroupsPage />} />
+            <Route path={GROUPS} element={<GroupsPage />} />
             <Route path={`${GROUP}/:id`} element={<GroupPage />} />
             <Route path={`${GROUP}/:id/modify`} element={<ModifyGroupPage />} />
             <Route path={`${GROUP}/create`} element={<CreateGroupPage />} />

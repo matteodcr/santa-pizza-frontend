@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
-import { Button, SimpleGrid, Text } from '@mantine/core';
+import { Button, em, SimpleGrid, Text } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { IconPlus } from '@tabler/icons-react';
+import { useMediaQuery } from '@mantine/hooks';
 import { useRootStore } from '@/stores/Root.store';
 import { GROUP } from '@/routes';
 import GroupCard from '@/components/Group/GroupCard';
@@ -11,6 +12,7 @@ import { showErrorNotification } from '@/utils/notification';
 const GroupsPage: React.FC = observer(() => {
   const store = useRootStore();
   const navigate = useNavigate();
+  const isMobile = useMediaQuery(`(max-width: ${em(750)})`);
 
   const { groups } = store.groupStore;
 
@@ -37,7 +39,7 @@ const GroupsPage: React.FC = observer(() => {
       </Button>
 
       {groups ? (
-        <SimpleGrid cols={2} py="1em">
+        <SimpleGrid cols={isMobile ? 1 : 2} py="1em">
           {groups.map((group) => (group ? <GroupCard key={group.id} group={group} /> : null))}
         </SimpleGrid>
       ) : (

@@ -6,11 +6,9 @@ import {
   Box,
   Button,
   Divider,
-  Flex,
   Group,
   Modal,
   Skeleton,
-  Space,
   Text,
   TextInput,
   Title,
@@ -19,15 +17,16 @@ import {
   useMantineColorScheme,
 } from '@mantine/core';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { notifications } from '@mantine/notifications';
 import { useDisclosure } from '@mantine/hooks';
-import { IconSettings, IconUpload, IconX } from '@tabler/icons-react';
+import { IconArchive, IconPencil } from '@tabler/icons-react';
 import { useRootStore } from '@/stores/Root.store';
 import PizzaComponent from '@/components/Group/PizzaComponent';
 import GroupMembers from '@/components/Group/GroupMembers';
 import { getDayDifference } from '@/utils/date';
 import GroupTimeline from '@/components/Group/GroupTimeline';
 import { showErrorNotification, showSuccessNotification } from '@/utils/notification';
+import { GroupBadge } from '@/components/Group/GroupCard';
+import { Membership } from '@/stores/entity/Membership';
 
 const GroupPage: React.FC = observer(() => {
   const store = useRootStore();
@@ -41,13 +40,11 @@ const GroupPage: React.FC = observer(() => {
 
   const { id } = useParams();
   const group = store.groupStore.getGroupById(Number(id));
-
-  const imageBackground = () => {
-    if (colorScheme === 'light') {
-      return 'rgba(255, 255, 255, 0.6)';
-    }
-    return 'rgba(0, 0, 0, 0.6)';
-  };
+  const currentUser = store.userStore.getCurrentUser();
+  let membership: Membership | undefined;
+  if (group && currentUser) {
+    membership = store.groupStore.getUserMembership(group, currentUser!);
+  }
 
   async function fetchData() {
     try {
@@ -70,24 +67,11 @@ const GroupPage: React.FC = observer(() => {
           username,
         }),
       ]);
+      await showSuccessNotification('User added successfully');
     } catch (e) {
-      if ((e as Response).status === 404) {
-        notifications.show({
-          title: 'User not found',
-          message: 'Please enter a valid username',
-          icon: <IconX />,
-          color: 'red',
-        });
-      } else if ((e as Response).status === 403) {
-        notifications.show({
-          title: 'User already in the group',
-          message: 'Impossible to add this user',
-          icon: <IconX />,
-          color: 'red',
-        });
-      }
-      throw e;
+      await showErrorNotification(e, 'Failed to add user');
     }
+    setUsername('');
   };
 
   const handleAssociateGroup = async () => {
@@ -100,35 +84,34 @@ const GroupPage: React.FC = observer(() => {
     }
   };
 
+  const handleCloseGroup = async () => {
+    try {
+      await store.api.closeGroup(Number(id));
+      await fetchData();
+      await showSuccessNotification('Group archived successfully');
+    } catch (e) {
+      await showErrorNotification(e, 'Failed to archive group');
+    }
+  };
+
   return group ? (
     <>
       <Box py="md">
-        <BackgroundImage
-          src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-6.png"
-          h={250}
-          radius="xl"
-        >
-          <Flex
-            mih={50}
-            gap="md"
-            justify="flex-end"
-            align="flex-end"
-            direction="column"
-            wrap="wrap"
-            h="100%"
+        {group.backgroundUrl! ? (
+          <BackgroundImage src={group.backgroundUrl!} h={350} radius="xl">
+            <GroupBadge status={group.status!} />
+          </BackgroundImage>
+        ) : (
+          <Box
+            h={350}
+            w="100%"
+            p={0}
+            style={{ borderRadius: 'calc(2rem * 1)' }}
+            bg="var(--mantine-color-blue-light)"
           >
-            <Box
-              p="0.2em"
-              style={{ borderRadius: '10px 0px 100% 0px', backgroundColor: imageBackground() }}
-            >
-              <UnstyledButton>
-                <Group>
-                  <IconUpload /> Upload <Space />
-                </Group>
-              </UnstyledButton>
-            </Box>
-          </Flex>
-        </BackgroundImage>
+            <GroupBadge status={group.status!} />
+          </Box>
+        )}
       </Box>
 
       <Group>
@@ -145,20 +128,26 @@ const GroupPage: React.FC = observer(() => {
         <Text lineClamp={openDescription ? 10 : 2}>{group?.description}</Text>
       </UnstyledButton>
 
-      <Group>
-        {group.status === 'OPEN' ? (
-          <Button onClick={() => handleAssociateGroup()}>Associate pizzas</Button>
-        ) : (
-          <Button leftSection={<IconX />}>Close Group</Button>
-        )}
-        <Button
-          variant="light"
-          leftSection={<IconSettings />}
-          onClick={() => navigate(`${location.pathname}/modify`)}
-        >
-          Settings
-        </Button>
-      </Group>
+      {membership?.role === 'ADMIN' && (
+        <Group>
+          {group.status === 'OPEN' ? (
+            <Button onClick={() => handleAssociateGroup()}>Associate pizzas</Button>
+          ) : (
+            group.status === 'ASSOCIATED' && (
+              <Button onClick={() => handleCloseGroup()} leftSection={<IconArchive />}>
+                Archive
+              </Button>
+            )
+          )}
+          <Button
+            variant="light"
+            leftSection={<IconPencil />}
+            onClick={() => navigate(`${location.pathname}/modify`)}
+          >
+            Modify
+          </Button>
+        </Group>
+      )}
 
       {group.status === 'ASSOCIATED' ? (
         <>

@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import classes from './Header.module.css';
-import { DASHBOARD, SIGNIN, SIGNUP } from '@/routes';
+import { GROUPS, SIGNIN, SIGNUP } from '@/routes';
 import { ProfileMenu } from '@/components/Shell/ProfileMenu';
 import { useRootStore } from '@/stores/Root.store';
 import { ColorSchemeToggle } from '@/components/ColorSchemeToggle/ColorSchemeToggle';
@@ -42,7 +42,7 @@ export const Header = observer(() => {
           </Group>
 
           <Group h="100%" gap={0} visibleFrom="sm">
-            <a href={DASHBOARD} className={classes.link}>
+            <a href={GROUPS} className={classes.link}>
               Groups
             </a>
           </Group>
@@ -77,7 +77,7 @@ export const Header = observer(() => {
         <ScrollArea h={`calc(100vh - ${rem(80)})`} mx="-md">
           <Divider my="sm" />
 
-          <a href={DASHBOARD} className={classes.link}>
+          <a href={GROUPS} className={classes.link}>
             Groups
           </a>
 

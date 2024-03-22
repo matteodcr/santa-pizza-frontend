@@ -1,12 +1,24 @@
 import React, { useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
-import { Button, Center, Group, Text, Textarea, TextInput, Title } from '@mantine/core';
+import {
+  BackgroundImage,
+  Button,
+  Center,
+  Group,
+  Skeleton,
+  Stack,
+  Text,
+  Textarea,
+  TextInput,
+  Title,
+} from '@mantine/core';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from '@mantine/form';
 import { DatePickerInput } from '@mantine/dates';
 import { useRootStore } from '@/stores/Root.store';
-import { GROUP } from '@/routes';
+import { GROUP, GROUPS } from '@/routes';
 import { showErrorNotification, showSuccessNotification } from '@/utils/notification';
+import CropBackgroundPicture from '@/components/Group/CropBackgroundPicture';
 
 const ModifyGroupPage: React.FC = observer(() => {
   const store = useRootStore();
@@ -108,12 +120,32 @@ const ModifyGroupPage: React.FC = observer(() => {
     }
   };
 
+  const handleDelete = async (groupId: number) => {
+    try {
+      await store.api.deleteGroup(groupId);
+      store.groupStore.deleteGroup(groupId);
+      await showSuccessNotification('Group deleted successfully');
+      navigate(GROUPS);
+    } catch (e) {
+      await showErrorNotification(e, 'Failed to delete group');
+    }
+  };
+
   return group !== undefined ? (
     <>
-      <Title py="md" order={1}>
-        Modify group
-      </Title>
       <form onSubmit={formName.onSubmit((values) => console.log(values))}>
+        <Title py="sm" order={1}>
+          Edit group
+        </Title>
+        <Stack align="center">
+          {group ? (
+            <BackgroundImage src={group.backgroundUrl!} h={250} radius="xl" />
+          ) : (
+            <Skeleton height={250} mb="xl" />
+          )}
+
+          <CropBackgroundPicture />
+        </Stack>
         <Group grow preventGrowOverflow={false}>
           <TextInput
             py="md"
@@ -150,6 +182,15 @@ const ModifyGroupPage: React.FC = observer(() => {
             </Button>
             <Button px="md" variant="outline" onClick={() => navigate(`${GROUP}/${id}`)} mt="md">
               Cancel
+            </Button>
+            <Button
+              px="md"
+              variant="light"
+              color="red"
+              onClick={() => handleDelete(Number(id!))}
+              mt="md"
+            >
+              Delete
             </Button>
           </Group>
         </Center>
