@@ -1,20 +1,24 @@
 import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
-import { CircleStencil, Cropper, CropperRef, ImageRestriction } from 'react-advanced-cropper';
+import { Cropper, CropperRef, ImageRestriction, RectangleStencil } from 'react-advanced-cropper';
 import { Button } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { observer } from 'mobx-react';
+import { useParams } from 'react-router-dom';
 import { useRootStore } from '@/stores/Root.store';
 import { showErrorNotification, showSuccessNotification } from '@/utils/notification';
 
-export const CropProfilePicture = observer(() => {
+export const CropBackgroundPicture = observer(() => {
   const store = useRootStore();
   const [image, setImage] = useState<string>(
     'https://images.unsplash.com/photo-1710432157519-e437027d2e8f?q=80&w=3759&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
   );
+  const { id } = useParams();
 
   const inputRef = useRef<HTMLInputElement>(null);
   const cropperRef = useRef<CropperRef>(null);
   const [userHasUploaded, setUserHasUploaded] = useState(false);
+
+  const group = store.groupStore.getGroupById(Number(id));
 
   const onCrop = async () => {
     const cropper = cropperRef.current;
@@ -27,8 +31,8 @@ export const CropProfilePicture = observer(() => {
               const formData = new FormData();
               formData.append('file', blob, 'image.jpg');
               try {
-                await store.api.updateAvatar(formData);
-                store.userStore.setCurrentAvatar(blob);
+                await store.api.updateBackground(formData, group.id!);
+                store.groupStore.setBackgroundUrl(group, blob);
                 await showSuccessNotification('Your avatar has been updated');
               } catch (error) {
                 await showErrorNotification(error, 'An error occurred while updating your avatar');
@@ -54,11 +58,13 @@ export const CropProfilePicture = observer(() => {
           src={image}
           stencilProps={{
             handlers: false,
-            lines: false,
-            movable: false,
+            lines: true,
+            grid: true,
+            movable: true,
             resizable: false,
+            aspectRatio: 10 / 5,
           }}
-          stencilComponent={CircleStencil}
+          stencilComponent={RectangleStencil}
           imageRestriction={ImageRestriction.stencil}
         />
       ),
@@ -109,4 +115,4 @@ export const CropProfilePicture = observer(() => {
   );
 });
 
-export default CropProfilePicture;
+export default CropBackgroundPicture;

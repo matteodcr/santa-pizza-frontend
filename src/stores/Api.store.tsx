@@ -1,6 +1,7 @@
 import { Group } from '@/stores/entity/Group';
 import { User } from '@/stores/entity/User';
 import { Membership } from '@/stores/entity/Membership';
+import { Pizza } from '@/stores/entity/Pizza';
 
 export interface SignUpData {
   username: string;
@@ -111,6 +112,10 @@ export default class Api {
     return new User(await this.fetch(`${this.user_url}/${username}`, init));
   }
 
+  async fetchPizza(pizzaId: number, init?: RequestInit | undefined): Promise<Pizza> {
+    return new Pizza(await this.fetch(`${this.pizza_url}/${pizzaId}`, init));
+  }
+
   async createGroup(createGroupData: CreateGroupData): Promise<Group> {
     const requestOptions: RequestInit = {
       method: 'POST',
@@ -142,6 +147,17 @@ export default class Api {
       body: init?.body,
     };
     return this.fetch(`${this.group_url}/${groupId}/associate`, requestOptions);
+  }
+
+  async closeGroup(groupId: number, init?: RequestInit | undefined): Promise<void> {
+    const requestOptions: RequestInit = {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: init?.body,
+    };
+    return this.fetch(`${this.group_url}/${groupId}/close`, requestOptions);
   }
 
   async updateGroupName(groupId: number, form: { name: string }): Promise<Group> {
@@ -216,6 +232,14 @@ export default class Api {
       body: formData,
     };
     return this.fetch(`${this.user_url}/upload`, requestOptions);
+  }
+
+  async updateBackground(formData: FormData, groupId: number): Promise<void> {
+    const requestOptions: RequestInit = {
+      method: 'POST',
+      body: formData,
+    };
+    return this.fetch(`${this.group_url}/${groupId}/upload`, requestOptions);
   }
 
   async changeRole(updateUserData: ChangeRoleData): Promise<Membership> {

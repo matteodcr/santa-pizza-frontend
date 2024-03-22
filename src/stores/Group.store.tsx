@@ -56,6 +56,12 @@ export class GroupStore {
     return undefined;
   }
 
+  setBackgroundUrl(group: Group, blob: Blob): void {
+    runInAction(() => {
+      group.backgroundUrl = URL.createObjectURL(blob);
+    });
+  }
+
   isRemovable(user: User, currentUser: User, group: Group): boolean {
     return (
       user?.username !== currentUser.username &&
